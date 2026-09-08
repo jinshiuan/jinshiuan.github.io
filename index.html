@@ -71,11 +71,37 @@ function plRenderTable(){
   plToggle.textContent=plShowAll?"HIDE ADDITIONAL PARTS":"VIEW ALL PARTS";
 }
 plToggle.addEventListener("click",()=>{plShowAll=!plShowAll;plRenderTable();if(!plShowAll)document.getElementById("partsl-product-database").scrollIntoView({behavior:"smooth",block:"start"});});
-function findPartLink(){
+async function findPartLink(){
   const q=document.getElementById("pl-q").value.trim(), nq=plNorm(q);
-  const hits=nq?PARTSLINK_DATA.filter(p=>plNorm(p[5])===nq||plNorm(p[4])===nq):[];
   const result=document.getElementById("pl-result"),notfound=document.getElementById("pl-notfound"),box=document.getElementById("pl-result-list");
+  const btn=document.getElementById("pl-search-btn");
   box.innerHTML="";
+  result.style.display="none";
+  notfound.style.display="none";
+  if(!q)return;
+  btn.disabled=true;
+  btn.textContent="SEARCHING...";
+  let hits=[];
+  try{
+    const safeQ=q.replace(/\\/g,"\\\\").replace(/%/g,"\\%").replace(/_/g,"\\_");
+    const [partRes,oemRes]=await Promise.all([
+      supabaseClient.from("partslik_data").select("vehicle,year,part_name,position,oem_no,partslik_no").ilike("partslik_no",safeQ),
+      supabaseClient.from("partslik_data").select("vehicle,year,part_name,position,oem_no,partslik_no").ilike("oem_no",safeQ)
+    ]);
+    if(partRes.error)throw partRes.error;
+    if(oemRes.error)throw oemRes.error;
+    const seen=new Set();
+    [...(partRes.data||[]),...(oemRes.data||[])].forEach(r=>{
+      const key=[r.vehicle,r.year,r.part_name,r.position,r.oem_no,r.partslik_no].map(v=>String(v||"")).join("\u0001");
+      if(!seen.has(key)){seen.add(key);hits.push([r.vehicle,r.year,r.part_name,r.position,r.oem_no,r.partslik_no]);}
+    });
+  }catch(err){
+    console.warn("Supabase PARTSLINK search failed; using embedded fallback.",err);
+    hits=nq?PARTSLINK_DATA.filter(p=>plNorm(p[5])===nq||plNorm(p[4])===nq):[];
+  }finally{
+    btn.disabled=false;
+    btn.textContent="SEARCH";
+  }
   result.style.display=hits.length?"block":"none";
   notfound.style.display=(!hits.length&&q)?"block":"none";
   if(hits.length){
