@@ -1,0 +1,47 @@
+name: Swap homepage hero positions
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  swap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Swap factory and AUTO PARTS positions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = s
+          s = s.replace('grid-template-columns:40% 60%;align-items:center;position:relative;z-index:2}.hero-copy{padding:70px 0;order:1}', 'grid-template-columns:60% 40%;align-items:center;position:relative;z-index:2}.hero-copy{padding:70px 0;order:2}', 1)
+          s = s.replace('hero-product{overflow:hidden;width:100%;min-width:0;height:600px;display:flex;align-items:center;justify-content:center;padding:10px;order:2}', 'hero-product{overflow:hidden;width:100%;min-width:0;height:600px;display:flex;align-items:center;justify-content:center;padding:10px;order:1}', 1)
+          if s == old:
+              raise SystemExit('Expected hero CSS pattern was not found; no change made.')
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit website change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'Swap factory and AUTO PARTS positions'
+          git push
+
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          git rm .github/workflows/swap-hero-position.yml || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Remove temporary hero position workflow' || true
+          git push || true
