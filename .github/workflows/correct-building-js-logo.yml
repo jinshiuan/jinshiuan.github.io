@@ -1,4 +1,4 @@
-name: Restore original building wall
+name: Remove building JS logo and restore wall
 on:
   push:
     branches: [main]
@@ -12,17 +12,46 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Restore the original building image only
+      - name: Restore untouched source building image
         run: |
           git checkout 59532c7c7d0d27695b5c9e4d70f3d27619c90059 -- assets/jinshiuan-building.png
-      - name: Commit only if the building image changed
+      - name: Remove only the building JS logo and reconstruct the wall
+        run: |
+          python3 -m pip install --quiet opencv-python-headless numpy
+          python3 - <<'PY'
+          import cv2
+          import numpy as np
+
+          path='assets/jinshiuan-building.png'
+          img=cv2.imread(path,cv2.IMREAD_COLOR)
+          if img is None:
+              raise SystemExit('building image could not be loaded')
+
+          # Exact perspective footprint of the JS sign on the building.
+          # Remove this sign only; the adjacent JINSHIUAN AUTO PARTS wall text stays untouched.
+          pts=np.array([[504,260],[604,260],[604,369],[502,380]],dtype=np.int32)
+
+          mask=np.zeros(img.shape[:2],dtype=np.uint8)
+          cv2.fillConvexPoly(mask,pts,255)
+
+          # Expand the mask slightly so no old black/white sign edge or shadow remains.
+          kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+          mask=cv2.dilate(mask,kernel,iterations=1)
+
+          # Reconstruct the corrugated white wall from surrounding pixels.
+          # Navier-Stokes inpainting avoids layering another logo or transparent patch.
+          cleaned=cv2.inpaint(img,mask,7,cv2.INPAINT_NS)
+
+          cv2.imwrite(path,cleaned,[cv2.IMWRITE_PNG_COMPRESSION,6])
+          PY
+      - name: Commit the wall-only version
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- assets/jinshiuan-building.png; then
-            echo "Building image is already the original wall. Nothing to change."
+          git add assets/jinshiuan-building.png
+          if git diff --cached --quiet; then
+            echo "No change needed."
             exit 0
           fi
-          git add assets/jinshiuan-building.png
-          git commit -m "Restore original building wall without logo"
+          git commit -m "Remove JS logo from building wall"
           git push
