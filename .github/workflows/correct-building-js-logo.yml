@@ -1,4 +1,4 @@
-name: Restore building wall without JS logo
+name: Restore exact original building image
 on:
   push:
     branches: [main]
@@ -12,60 +12,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Restore original building photo first
+      - name: Restore exact original image
         run: |
-          git checkout 7c4f37ade64247172e8e6fa24e060abd475147cc -- assets/jinshiuan-building.png
-      - name: Remove only the JS sign with a clean wall patch
-        run: |
-          python3 -m pip install --quiet opencv-python-headless numpy
-          python3 - <<'PY'
-          import cv2, numpy as np
-
-          path='assets/jinshiuan-building.png'
-          img=cv2.imread(path,cv2.IMREAD_COLOR)
-          if img is None:
-              raise SystemExit('building image load failed')
-
-          # The JS sign occupies this small front-wall rectangle.
-          x1,y1,x2,y2 = 503,260,605,380
-          w,h = x2-x1, y2-y1
-
-          # Use a nearby clean section of the SAME corrugated wall.
-          # This avoids inpainting/AI reconstruction and therefore avoids the
-          # grey triangular shadow that appeared in the previous version.
-          sx1,sy1,sx2,sy2 = 610,315,650,395
-          patch=img[sy1:sy2,sx1:sx2].copy()
-          if patch.size == 0:
-              raise SystemExit('clean wall source patch is empty')
-
-          patch=cv2.resize(patch,(w,h),interpolation=cv2.INTER_LANCZOS4)
-
-          # Blend only a very small border so the replacement is opaque but
-          # does not leave a hard rectangular seam.
-          alpha=np.ones((h,w),np.float32)
-          b=5
-          alpha[:b,:]*=np.linspace(0,1,b)[:,None]
-          alpha[-b:,:]*=np.linspace(1,0,b)[:,None]
-          alpha[:,:b]*=np.linspace(0,1,b)[None,:]
-          alpha[:,-b:]*=np.linspace(1,0,b)[None,:]
-
-          dst=img[y1:y2,x1:x2].astype(np.float32)
-          src=patch.astype(np.float32)
-          a=alpha[...,None]
-          out=(src*a + dst*(1-a)).astype(np.uint8)
-
-          # Fully replace the centre: there is no old logo/shadow underneath.
-          img[y1:y2,x1:x2]=out
-          cv2.imwrite(path,img,[cv2.IMWRITE_PNG_COMPRESSION,6])
-          PY
-      - name: Commit only the corrected building image
+          git checkout 9d0120414239ff2f66cf0789876b951919ee2cd8 -- assets/jinshiuan-building.png
+      - name: Commit exact original image only
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/jinshiuan-building.png
           if git diff --cached --quiet; then
-            echo "No change needed."
+            echo "Image is already the exact original."
             exit 0
           fi
-          git commit -m "Restore clean building wall without JS logo"
+          git commit -m "Restore exact original building image"
           git push
