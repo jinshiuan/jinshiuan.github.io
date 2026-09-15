@@ -128,6 +128,17 @@
   .hero-static img{transform:translateX(-3cm)!important;}
 }
 </style>
+
+<style>
+/* FINAL FIX: factory image stays fully left of AUTO PARTS text */
+@media (min-width:901px){
+  .hero-inner{grid-template-columns:38% 28% 34%!important;}
+  .hero-product{overflow:visible!important;justify-content:flex-start!important;padding:0!important;}
+  .hero-static{justify-content:flex-start!important;padding:0!important;overflow:visible!important;}
+  .hero-static img{width:500px!important;max-width:500px!important;max-height:340px!important;height:auto!important;transform:translateX(-3cm)!important;}
+  .hero-copy{position:relative!important;z-index:4!important;padding-left:10px!important;}
+}
+</style>
 </head><body>
 <header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="data:image/webp;base64,UklGRhYlAABXRUJQVlA4WAoAAAAQAAAAjwEARgAAQUxQSBESAAABsIbtnzKn
 1e8/M5sNgbSEpN6Uuru7O9S9UFfokbpDvWTr7o4tWndvz8HrpYqEYikESKCQ
