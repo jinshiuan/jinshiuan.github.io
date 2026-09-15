@@ -1,4 +1,4 @@
-name: Correct building JS logo
+name: Final building JS logo from the website screenshot
 on:
   push:
     branches: [main]
@@ -10,50 +10,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Restore the original building image
+      - name: Restore untouched building photo
         run: |
           curl -L --fail -o assets/jinshiuan-building.png https://raw.githubusercontent.com/jinshiuan/jinshiuan.github.io/59532c7c7d0d27695b5c9e4d70f3d27619c90059/assets/jinshiuan-building.png
-
-      - name: Copy the exact JS logo from the website header
+      - name: Put the exact red-J white-S website logo onto the sign
+        env:
+          LOGO_B64: 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
         run: |
-          curl -L --fail -o /tmp/header.webp https://raw.githubusercontent.com/jinshiuan/jinshiuan.github.io/main/assets/jinshiuan-logo-header.webp
           python3 -m pip install --quiet pillow opencv-python-headless
           python3 - <<'PY'
+          import os, base64, cv2, numpy as np
           from PIL import Image
-          import cv2, numpy as np
-
-          # The website header asset is 400x70. Its first 70x70 pixels are
-          # the exact red-J / white-S / black-square JS logo shown on the site.
-          header = Image.open('/tmp/header.webp').convert('RGBA')
-          js = header.crop((0, 0, 70, 70))
-          js.save('/tmp/js-logo.png')
-
-          building = cv2.imread('assets/jinshiuan-building.png', cv2.IMREAD_COLOR)
-          logo = cv2.imread('/tmp/js-logo.png', cv2.IMREAD_COLOR)
-          if building is None or logo is None:
+          open('/tmp/js.png','wb').write(base64.b64decode(os.environ['LOGO_B64']))
+          logo=cv2.imread('/tmp/js.png',cv2.IMREAD_COLOR)
+          building=cv2.imread('assets/jinshiuan-building.png',cv2.IMREAD_COLOR)
+          if logo is None or building is None:
               raise SystemExit('image load failed')
-
-          # Original sign plane on the building photo.
-          dst = np.float32([[507,263],[601,263],[601,366],[506,377]])
-          src = np.float32([[0,0],[69,0],[69,69],[0,69]])
-          M = cv2.getPerspectiveTransform(src, dst)
-          warped = cv2.warpPerspective(
-              logo, M, (building.shape[1], building.shape[0]),
-              flags=cv2.INTER_LANCZOS4
-          )
-
-          mask = np.zeros(building.shape[:2], np.uint8)
-          cv2.fillConvexPoly(mask, np.int32(dst), 255)
-          building[mask > 0] = warped[mask > 0]
-          cv2.imwrite('assets/jinshiuan-building.png', building,
-                      [cv2.IMWRITE_PNG_COMPRESSION, 6])
+          # Original JS sign plane on the supplied building photo.
+          dst=np.float32([[507,263],[601,263],[601,366],[506,377]])
+          src=np.float32([[0,0],[63,0],[63,63],[0,63]])
+          M=cv2.getPerspectiveTransform(src,dst)
+          warped=cv2.warpPerspective(logo,M,(building.shape[1],building.shape[0]),flags=cv2.INTER_LANCZOS4)
+          mask=np.zeros(building.shape[:2],np.uint8)
+          cv2.fillConvexPoly(mask,np.int32(dst),255)
+          building[mask>0]=warped[mask>0]
+          cv2.imwrite('assets/jinshiuan-building.png',building,[cv2.IMWRITE_PNG_COMPRESSION,6])
           PY
-
-      - name: Commit the corrected building image
+      - name: Commit corrected building photo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/jinshiuan-building.png
-          git commit -m "Use exact website JS logo on building"
+          git commit -m "Fix building logo with exact website logo"
           git push
