@@ -1,0 +1,20 @@
+name: Inspect header logo
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect logo
+        run: |
+          cp assets/jinshiuan-logo-header.webp /tmp/header.webp
+          cp assets/jinshiuan-building.png /tmp/building.png
+          cd /tmp && zip logo-inspect.zip header.webp building.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: logo-inspect
+          path: /tmp/logo-inspect.zip
