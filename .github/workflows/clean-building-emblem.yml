@@ -1,0 +1,35 @@
+name: Clean building emblem
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Match the exact website header emblem
+        run: |
+          python3 -m pip install --quiet pillow opencv-python-headless
+          python3 - <<'PY'
+          import cv2, numpy as np
+          base=cv2.imread('assets/jinshiuan-building.png')
+          header=cv2.imread('assets/jinshiuan-logo-header.webp')
+          logo=header[2:63,6:66]
+          src=np.float32([[0,0],[59,0],[59,60],[0,60]])
+          dst=np.float32([[514,274],[608,260],[608,370],[515,382]])
+          M=cv2.getPerspectiveTransform(src,dst)
+          warped=cv2.warpPerspective(logo,M,(base.shape[1],base.shape[0]),flags=cv2.INTER_LANCZOS4,borderMode=cv2.BORDER_CONSTANT,borderValue=(255,255,255))
+          mask=np.zeros((base.shape[0],base.shape[1]),np.uint8)
+          cv2.fillConvexPoly(mask,np.int32(dst),255)
+          base[mask>0]=warped[mask>0]
+          cv2.imwrite('assets/jinshiuan-building.png',base,[cv2.IMWRITE_PNG_COMPRESSION,6])
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/jinshiuan-building.png
+          git rm .github/workflows/clean-building-emblem.yml
+          git commit -m "Apply exact website emblem to building"
+          git push
