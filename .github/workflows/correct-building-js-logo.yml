@@ -1,0 +1,46 @@
+name: Correct building JS logo
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore original building
+        run: |
+          curl -L --fail -o assets/jinshiuan-building.png https://raw.githubusercontent.com/jinshiuan/jinshiuan.github.io/7c4f37ade64247172e8e6fa24e060abd475147cc/assets/jinshiuan-building.png
+      - name: Copy the website's original JS logo
+        run: |
+          python3 -m pip install --quiet pillow opencv-python-headless
+          python3 - <<'PY'
+          import cv2, numpy as np
+          from PIL import Image
+          header=Image.open('assets/jinshiuan-logo-header.webp').convert('RGBA')
+          if header.size != (399,70):
+              raise SystemExit(f'Unexpected website logo size: {header.size}')
+          # The website logo's original JS emblem is the left 70x70 pixels.
+          logo=np.array(header.crop((0,0,70,70)))
+          building=cv2.imread('assets/jinshiuan-building.png',cv2.IMREAD_COLOR)
+          if building is None: raise SystemExit('building image missing')
+          # Original JS sign plane on the building; replace the whole sign, not overlay fragments.
+          dst=np.float32([[507,263],[601,263],[601,366],[506,377]])
+          src=np.float32([[0,0],[69,0],[69,69],[0,69]])
+          M=cv2.getPerspectiveTransform(src,dst)
+          warped=cv2.warpPerspective(logo[:,:,:3],M,(building.shape[1],building.shape[0]),flags=cv2.INTER_LANCZOS4,borderMode=cv2.BORDER_CONSTANT,borderValue=(0,0,0))
+          mask=np.zeros(building.shape[:2],np.uint8)
+          cv2.fillConvexPoly(mask,np.int32(dst),255)
+          building[mask>0]=warped[mask>0]
+          cv2.imwrite('assets/jinshiuan-building.png',building,[cv2.IMWRITE_PNG_COMPRESSION,6])
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/jinshiuan-building.png
+          git rm .github/workflows/correct-building-js-logo.yml
+          git commit -m "Correct building JS logo"
+          git push
