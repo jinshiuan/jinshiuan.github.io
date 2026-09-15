@@ -6,19 +6,17 @@ permissions:
   contents: write
 jobs:
   fix:
-    if: contains(github.event.head_commit.message, 'Fix building JS logo') == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Remove incorrect white mark beside J
         run: |
+          python3 -m pip install --quiet pillow
           python3 - <<'PY'
-          from PIL import Image, ImageDraw, ImageFilter
+          from PIL import Image, ImageFilter
           p='assets/jinshiuan-building.png'
           im=Image.open(p).convert('RGB')
           pix=im.load()
-          # Remove only the separate white mark beside the J.
-          # It is inside the black JS panel, around x=532..555, y=323..337.
           mask=Image.new('L', im.size, 0)
           mp=mask.load()
           for y in range(321,339):
