@@ -1,0 +1,38 @@
+name: Match building logo to website logo
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  match:
+    if: contains(github.event.head_commit.message, 'Match building logo to website logo') == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace building JS logo with exact website logo
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image
+          import numpy as np
+          import cv2
+          base=cv2.imread('assets/jinshiuan-building.png')
+          header=cv2.imread('assets/jinshiuan-logo-header.webp')
+          logo=header[0:70,0:70]
+          src=np.float32([[0,0],[69,0],[69,69],[0,69]])
+          dst=np.float32([[507,263],[601,263],[601,366],[506,377]])
+          M=cv2.getPerspectiveTransform(src,dst)
+          warp=cv2.warpPerspective(logo,M,(base.shape[1],base.shape[0]),borderMode=cv2.BORDER_CONSTANT,borderValue=(255,255,255))
+          mask_src=np.ones((70,70),np.uint8)*255
+          mask=cv2.warpPerspective(mask_src,M,(base.shape[1],base.shape[0]),borderMode=cv2.BORDER_CONSTANT,borderValue=0)
+          base[mask>0]=warp[mask>0]
+          cv2.imwrite('assets/jinshiuan-building.png',base,[cv2.IMWRITE_PNG_COMPRESSION,6])
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/jinshiuan-building.png
+          git rm .github/workflows/match-building-logo.yml
+          git rm .github/workflows/inspect-header-logo.yml
+          git commit -m "Match building logo to website logo"
+          git push
