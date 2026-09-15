@@ -1,0 +1,30 @@
+name: Correct building JS logo
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove incorrect J tail extension
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          p='assets/jinshiuan-building.png'
+          im=Image.open(p).convert('RGB')
+          d=ImageDraw.Draw(im)
+          # Only cover the incorrect dark extension from J toward S.
+          # This leaves the red J, white S, and surrounding building unchanged.
+          d.polygon([(528,317),(557,317),(557,329),(545,333),(532,330)], fill=(18,18,18))
+          im.save(p, 'PNG', optimize=True)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/jinshiuan-building.png
+          git rm .github/workflows/correct-building-js-logo.yml
+          git commit -m "Correct building JS logo tail"
+          git push
