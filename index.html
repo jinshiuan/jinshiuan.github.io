@@ -31,6 +31,26 @@
 .hero-static img{display:block!important;width:auto!important;height:auto!important;max-width:430px!important;max-height:270px!important;object-fit:contain!important}
 .hero-copy{grid-column:2!important;grid-row:1!important;padding:40px 0!important}
 }
+</style><style>
+/* HERO: factory | AUTO PARTS | product carousel */
+@media(min-width:901px){
+.hero{min-height:420px!important}
+.hero-inner{display:grid!important;grid-template-columns:30% 32% 38%!important;min-height:420px!important;align-items:center!important;gap:0!important}
+.hero-product{grid-column:1!important;grid-row:1!important;height:330px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.hero-static{height:330px!important;padding:8px!important}
+.hero-static img{width:auto!important;height:auto!important;max-width:330px!important;max-height:210px!important;object-fit:contain!important}
+.hero-copy{grid-column:2!important;grid-row:1!important;padding:20px!important}
+.hero-copy h1{font-size:clamp(40px,4.2vw,62px)!important}
+.hero-carousel{grid-column:3!important;grid-row:1!important;width:100%!important;padding:10px 24px!important}
+.hero-carousel .eyebrow{text-align:center!important;margin-bottom:8px!important}
+.hero-carousel .home-carousel-wrap{max-width:330px!important;margin:0 auto!important}
+.hero-carousel .home-carousel-viewport{height:250px!important;border-radius:14px!important}
+.hero-carousel .home-carousel-slide img{width:100%!important;height:100%!important;object-fit:contain!important;padding:12px!important}
+.hero-carousel .home-carousel-btn{width:34px!important;height:34px!important;font-size:22px!important}
+.hero-carousel .home-carousel-prev{left:6px!important}
+.hero-carousel .home-carousel-next{right:6px!important}
+.hero-carousel .home-carousel-dots{margin-top:8px!important}
+}
 </style></head><body>
 <header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="data:image/webp;base64,UklGRhYlAABXRUJQVlA4WAoAAAAQAAAAjwEARgAAQUxQSBESAAABsIbtnzKn
 1e8/M5sNgbSEpN6Uuru7O9S9UFfokbpDvWTr7o4tWndvz8HrpYqEYikESKCQ
@@ -245,8 +265,11 @@ bTEESdBlxpsE3n73XUI+IRi7pRpiY+3wSbEzLt5Bnb2v7hgYa5khTJgcY2hy
 1Wqc8Tq8CMTzEzkGSGGXgOb7xqSkczkTMp/R0va1c8x/jb8d/8g39lXZg2ey
 Ov5ifbAAAA==
 " alt="JINSHIUAN AUTO PARTS" loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
-<main><section class="hero"><div class="wrap hero-inner"><div class="hero-copy"><div class="kicker">JINSHIUAN</div><h1>AUTO<br>PARTS</h1><p>Parts Development · Sourcing · Export</p><a class="btn" href="#products">VIEW PRODUCTS</a></div><div class="hero-product"><div class="hero-static"><img src="assets/jinshiuan-building.png" alt="JINSHIUAN Factory Building" loading="eager"></div></div></div></section>
-<section class="home-carousel" id="featured" aria-label="Featured Products"><div class="wrap"><div class="eyebrow" style="text-align:center;margin-bottom:12px">FEATURED PRODUCTS</div><div class="home-carousel-wrap"><div class="home-carousel-viewport" id="homeCarouselViewport"><div class="home-carousel-slide active"><img src="assets/image-01.webp" alt="JINSHIUAN Automotive Part 01" loading="eager"></div></div><button class="home-carousel-btn home-carousel-prev" id="homeCarouselPrev" type="button" aria-label="Previous">‹</button><button class="home-carousel-btn home-carousel-next" id="homeCarouselNext" type="button" aria-label="Next">›</button><div class="home-carousel-dots" id="homeCarouselDots"></div></div></div></section>
+<main><section class="hero"><div class="wrap hero-inner">
+<div class="hero-product"><div class="hero-static"><img src="assets/jinshiuan-building.png" alt="JINSHIUAN Factory Building" loading="eager"></div></div>
+<div class="hero-copy"><div class="kicker">JINSHIUAN</div><h1>AUTO<br>PARTS</h1><p>Parts Development · Sourcing · Export</p><a class="btn" href="#products">VIEW PRODUCTS</a></div>
+<div class="hero-carousel"><div class="eyebrow">FEATURED PRODUCTS</div><div class="home-carousel-wrap"><div class="home-carousel-viewport" id="homeCarouselViewport"><div class="home-carousel-slide active"><img src="assets/image-01.webp" alt="JINSHIUAN Automotive Part 01" loading="eager"></div></div><button class="home-carousel-btn home-carousel-prev" id="homeCarouselPrev" type="button" aria-label="Previous">‹</button><button class="home-carousel-btn home-carousel-next" id="homeCarouselNext" type="button" aria-label="Next">›</button><div class="home-carousel-dots" id="homeCarouselDots"></div></div></div>
+</div></section>
 <section class="pl-section" id="partsl-search"><div class="pl-wrap">
 <div class="pl-eyebrow">PARTSLINK &amp; PART NUMBER</div>
 <h2 class="pl-title">Find the Parts You Need</h2>
