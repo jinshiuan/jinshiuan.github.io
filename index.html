@@ -111,7 +111,46 @@
   .hero-static{height:500px!important;padding:0!important;}
   .hero-static img{display:block!important;width:700px!important;max-width:700px!important;height:auto!important;max-height:470px!important;object-fit:contain!important;}
 }
-</style></head><body>
+</style>
+<style>
+/* FINAL DESKTOP HERO FIX — move factory image left so it never covers AUTO PARTS */
+@media (min-width:901px){
+  .hero-inner{
+    width:min(1200px,calc(100% - 40px))!important;
+    grid-template-columns:40% 26% 34%!important;
+    min-height:500px!important;
+  }
+  .hero-product{
+    grid-column:1!important;
+    height:500px!important;
+    justify-content:flex-start!important;
+    overflow:visible!important;
+    padding:0!important;
+  }
+  .hero-static{
+    width:100%!important;
+    height:500px!important;
+    justify-content:flex-start!important;
+    padding:0!important;
+  }
+  .hero-static img{
+    display:block!important;
+    width:500px!important;
+    max-width:500px!important;
+    max-height:340px!important;
+    height:auto!important;
+    object-fit:contain!important;
+    transform:translateX(-10px)!important;
+  }
+  .hero-copy{
+    grid-column:2!important;
+    padding:20px 8px!important;
+    position:relative!important;
+    z-index:2!important;
+  }
+}
+</style>
+</head><body>
 <header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="data:image/webp;base64,UklGRhYlAABXRUJQVlA4WAoAAAAQAAAAjwEARgAAQUxQSBESAAABsIbtnzKn
 1e8/M5sNgbSEpN6Uuru7O9S9UFfokbpDvWTr7o4tWndvz8HrpYqEYikESKCQ
 3R35fXjnXXps4duJiAngf8PAhatCsLL4//77v/9W8mlTpgDQpsyESZeISU9R
