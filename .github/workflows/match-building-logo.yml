@@ -6,17 +6,14 @@ permissions:
   contents: write
 jobs:
   match:
-    if: contains(github.event.head_commit.message, 'Match building logo to website logo') == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Replace building JS logo with exact website logo
         run: |
-          python3 -m pip install --quiet pillow
+          python3 -m pip install --quiet pillow opencv-python-headless
           python3 - <<'PY'
-          from PIL import Image
-          import numpy as np
-          import cv2
+          import cv2, numpy as np
           base=cv2.imread('assets/jinshiuan-building.png')
           header=cv2.imread('assets/jinshiuan-logo-header.webp')
           logo=header[0:70,0:70]
@@ -34,5 +31,5 @@ jobs:
           git add assets/jinshiuan-building.png
           git rm .github/workflows/match-building-logo.yml
           git rm .github/workflows/inspect-header-logo.yml
-          git commit -m "Match building logo to website logo"
+          git commit -m "Update building logo"
           git push
