@@ -1,61 +1,28 @@
-name: Final building JS logo from website header
+name: Restore original building wall
 on:
   push:
     branches: [main]
 permissions:
   contents: write
 jobs:
-  fix:
+  restore:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Restore untouched building photo
+        with:
+          fetch-depth: 0
+      - name: Restore the original building image only
         run: |
-          curl -L --fail -o assets/jinshiuan-building.png https://raw.githubusercontent.com/jinshiuan/jinshiuan.github.io/59532c7c7d0d27695b5c9e4d70f3d27619c90059/assets/jinshiuan-building.png
-      - name: Extract the exact black JS logo
-        run: |
-          curl -L --fail -o /tmp/header.webp https://raw.githubusercontent.com/jinshiuan/jinshiuan.github.io/main/assets/jinshiuan-logo-header.webp
-          python3 - <<'PY'
-          import cv2, numpy as np
-          im=cv2.imread('/tmp/header.webp',cv2.IMREAD_COLOR)
-          if im is None: raise SystemExit('header load failed')
-          roi=im[0:64,0:70]
-          gray=cv2.cvtColor(roi,cv2.COLOR_BGR2GRAY)
-          bw=(gray < 80).astype(np.uint8)*255
-          n, labels, stats, cents=cv2.connectedComponentsWithStats(bw,8)
-          candidates=[]
-          for k in range(1,n):
-              x,y,w,h,area=stats[k]
-              if w>=35 and h>=35 and area>=1000:
-                  candidates.append((area,x,y,w,h))
-          if not candidates: raise SystemExit('black JS square not found')
-          _,x,y,w,h=max(candidates)
-          cv2.imwrite('/tmp/js.png',roi[y:y+h,x:x+w])
-          print('JS crop:',x,y,w,h)
-          PY
-      - name: Fully cover old sign and place one logo with no under-shadow
-        run: |
-          python3 - <<'PY'
-          import cv2, numpy as np
-          logo=cv2.imread('/tmp/js.png',cv2.IMREAD_COLOR)
-          building=cv2.imread('assets/jinshiuan-building.png',cv2.IMREAD_COLOR)
-          if logo is None or building is None: raise SystemExit('image load failed')
-          # Slightly oversize the destination so none of the old sign/shadow can remain.
-          dst=np.float32([[503,259],[605,259],[605,370],[502,381]])
-          src=np.float32([[0,0],[logo.shape[1]-1,0],[logo.shape[1]-1,logo.shape[0]-1],[0,logo.shape[0]-1]])
-          M=cv2.getPerspectiveTransform(src,dst)
-          warped=cv2.warpPerspective(logo,M,(building.shape[1],building.shape[0]),flags=cv2.INTER_LANCZOS4)
-          mask=np.zeros(building.shape[:2],np.uint8)
-          cv2.fillConvexPoly(mask,np.int32(dst),255)
-          # Opaque replacement: the old logo is not blended or layered underneath.
-          building[mask>0]=warped[mask>0]
-          cv2.imwrite('assets/jinshiuan-building.png',building,[cv2.IMWRITE_PNG_COMPRESSION,6])
-          PY
-      - name: Commit corrected building photo
+          git checkout 59532c7c7d0d27695b5c9e4d70f3d27619c90059 -- assets/jinshiuan-building.png
+      - name: Commit only if the building image changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- assets/jinshiuan-building.png; then
+            echo "Building image is already the original wall. Nothing to change."
+            exit 0
+          fi
           git add assets/jinshiuan-building.png
-          git commit -m "Remove old JS logo shadow and place one opaque logo"
+          git commit -m "Restore original building wall without logo"
           git push
