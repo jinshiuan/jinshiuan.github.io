@@ -18,33 +18,37 @@ jobs:
         run: |
           python - <<'PY'
           import base64, json, os, urllib.request
-          repo = os.environ['GITHUB_REPOSITORY']
-          api = f'https://api.github.com/repos/{repo}/contents/index.html?ref=main'
-          req = urllib.request.Request(api, headers={'Authorization': f"Bearer {os.environ['GH_TOKEN']}",'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
-          with urllib.request.urlopen(req) as r: obj = json.load(r)
-          text = base64.b64decode(obj['content']).decode('utf-8')
-          dynamic = '''<script>
-          const HOME_CAROUSEL_SUPABASE_URL='https://mkujndpbwjwumcclafcd.supabase.co';
-          const HOME_CAROUSEL_SUPABASE_KEY='sb_publishable_QwdKQAw1bqwDCF05-ghdMg_Ipj6kghD';
-          let homeCarouselIdx=0,homeCarouselTimer=null,HOME_CAROUSEL_IMAGES=[];
-          const HOME_CAROUSEL_FALLBACK=["assets/image-01.webp","assets/image-02.webp","assets/image-03.webp","assets/image-04.webp","assets/image-05.webp","assets/image-06.webp","assets/image-07.webp","assets/image-08.webp","assets/image-09.webp","assets/image-10.webp","assets/image-11.webp","assets/image-12.webp","assets/image-13.webp","assets/image-14.webp"];
-          function renderHomeCarousel(){const v=document.getElementById('homeCarouselViewport'),d=document.getElementById('homeCarouselDots');if(!v||!d||!HOME_CAROUSEL_IMAGES.length)return;homeCarouselIdx=(homeCarouselIdx+HOME_CAROUSEL_IMAGES.length)%HOME_CAROUSEL_IMAGES.length;v.innerHTML=HOME_CAROUSEL_IMAGES.map((src,i)=>'<div class="home-carousel-slide '+(i===homeCarouselIdx?'active':'')+'"><img src="'+src+'" alt="JINSHIUAN Automotive Part '+String(i+1).padStart(2,'0')+'" loading="'+(i===0?'eager':'lazy')+'"></div>').join('');d.innerHTML=HOME_CAROUSEL_IMAGES.map((_,i)=>'<button type="button" class="home-carousel-dot '+(i===homeCarouselIdx?'active':'')+'" aria-label="Product '+(i+1)+'" onclick="homeCarouselGo('+i+')"></button>').join('')}
-          function homeCarouselGo(n){homeCarouselIdx=(n+HOME_CAROUSEL_IMAGES.length)%HOME_CAROUSEL_IMAGES.length;renderHomeCarousel();startHomeCarousel()}
-          function startHomeCarousel(){clearInterval(homeCarouselTimer);homeCarouselTimer=setInterval(()=>homeCarouselGo(homeCarouselIdx+1),4000)}
-          async function loadHomeCarouselFromCloud(){try{const u=HOME_CAROUSEL_SUPABASE_URL+'/rest/v1/products?select=images,sort_order&active=eq.true&order=sort_order.asc';const r=await fetch(u,{headers:{apikey:HOME_CAROUSEL_SUPABASE_KEY,Authorization:'Bearer '+HOME_CAROUSEL_SUPABASE_KEY}});if(!r.ok)throw new Error('Supabase HTTP '+r.status);const rows=await r.json();const cloud=[];for(const p of (Array.isArray(rows)?rows:[])){const imgs=Array.isArray(p.images)?p.images:[];for(const src of imgs)if(typeof src==='string'&&src.trim())cloud.push(src.trim())}HOME_CAROUSEL_IMAGES=cloud.length?cloud:HOME_CAROUSEL_FALLBACK.slice()}catch(e){console.warn('Homepage cloud carousel load failed; using existing carousel images.',e);HOME_CAROUSEL_IMAGES=HOME_CAROUSEL_FALLBACK.slice()}renderHomeCarousel();startHomeCarousel()}
-          document.getElementById('homeCarouselPrev')?.addEventListener('click',()=>homeCarouselGo(homeCarouselIdx-1));document.getElementById('homeCarouselNext')?.addEventListener('click',()=>homeCarouselGo(homeCarouselIdx+1));loadHomeCarouselFromCloud();
+          repo=os.environ['GITHUB_REPOSITORY']
+          api=f'https://api.github.com/repos/{repo}/contents/index.html?ref=main'
+          req=urllib.request.Request(api,headers={'Authorization':f"Bearer {os.environ['GH_TOKEN']}",'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
+          with urllib.request.urlopen(req) as r: obj=json.load(r)
+          text=base64.b64decode(obj['content']).decode('utf-8')
+          marker_start='<script id="jinshiuan-cloud-carousel">'
+          marker_end='</script>'
+          if marker_start in text:
+              a=text.find(marker_start); b=text.find(marker_end,a)
+              if b<0: raise SystemExit('Existing cloud carousel script is incomplete')
+              text=text[:a]+text[b+len(marker_end):]
+          dynamic=r'''<script id="jinshiuan-cloud-carousel">
+          (async function(){
+            const URL='https://mkujndpbwjwumcclafcd.supabase.co';
+            const KEY='sb_publishable_QwdKQAw1bqwDCF05-ghdMg_Ipj6kghD';
+            const fallback=["assets/image-01.webp","assets/image-02.webp","assets/image-03.webp","assets/image-04.webp","assets/image-05.webp","assets/image-06.webp","assets/image-07.webp","assets/image-08.webp","assets/image-09.webp","assets/image-10.webp","assets/image-11.webp","assets/image-12.webp","assets/image-13.webp","assets/image-14.webp"];
+            let images=fallback.slice(),idx=0,timer=null,rendering=false;
+            const viewport=()=>document.getElementById('homeCarouselViewport');
+            const dots=()=>document.getElementById('homeCarouselDots');
+            function render(){const v=viewport(),d=dots();if(!v||!d||!images.length)return;if(rendering)return;rendering=true;idx=(idx+images.length)%images.length;v.innerHTML=images.map((src,i)=>'<div class="home-carousel-slide '+(i===idx?'active':'')+'"><img src="'+src+'" alt="JINSHIUAN Automotive Part '+String(i+1).padStart(2,'0')+'" loading="'+(i===0?'eager':'lazy')+'"></div>').join('');d.innerHTML=images.map((_,i)=>'<button type="button" class="home-carousel-dot '+(i===idx?'active':'')+'" aria-label="Product '+(i+1)+'"></button>').join('');rendering=false}
+            function go(n){idx=(n+images.length)%images.length;render();start()}
+            function start(){clearInterval(timer);timer=setInterval(()=>go(idx+1),4000)}
+            async function load(){try{const r=await fetch(URL+'/rest/v1/products?select=images,sort_order&active=eq.true&order=sort_order.asc',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});if(!r.ok)throw new Error('Supabase HTTP '+r.status);const rows=await r.json();const cloud=[];for(const p of (Array.isArray(rows)?rows:[])){for(const src of (Array.isArray(p.images)?p.images:[])){if(typeof src==='string'&&src.trim())cloud.push(src.trim())}}if(cloud.length)images=cloud}catch(e){console.warn('Cloud carousel unavailable; keeping existing images.',e)}render();start()}
+            function wire(){const p=document.getElementById('homeCarouselPrev'),n=document.getElementById('homeCarouselNext');if(p){const x=p.cloneNode(true);p.replaceWith(x);x.addEventListener('click',()=>go(idx-1))}if(n){const x=n.cloneNode(true);n.replaceWith(x);x.addEventListener('click',()=>go(idx+1))}const d=dots();if(d)d.addEventListener('click',e=>{const b=e.target.closest('.home-carousel-dot');if(b){const all=[...d.querySelectorAll('.home-carousel-dot')];const i=all.indexOf(b);if(i>=0)go(i)}})}
+            function observe(){const v=viewport();if(!v)return;new MutationObserver(()=>{if(!rendering){const current=[...v.querySelectorAll('img')].map(x=>x.getAttribute('src')||'');if(current.length!==images.length||current.some((x,i)=>x!==images[i]))render()}}).observe(v,{childList:true})}
+            const wait=setInterval(()=>{if(viewport()){clearInterval(wait);wire();observe();load()}},100);
+          })();
           </script>'''
-          start = text.find('(function renderFeaturedCarousel(){')
-          if start < 0: raise SystemExit('renderFeaturedCarousel block not found')
-          end = text.find('</script>', start)
-          if end < 0: raise SystemExit('renderFeaturedCarousel script end not found')
-          text = text[:text.rfind('<script>', 0, start)] + dynamic + text[end+9:]
-          final_start = text.rfind('<script>\nconst HOME_CAROUSEL_IMAGES=')
-          if final_start < 0: final_start = text.rfind('<script>const HOME_CAROUSEL_IMAGES=')
-          if final_start < 0: raise SystemExit('final hard-coded carousel script not found')
-          final_end = text.find('</script>', final_start)
-          if final_end < 0: raise SystemExit('final carousel script end not found')
-          text = text[:final_start] + text[final_end+9:]
+          pos=text.rfind('</body>')
+          if pos<0: raise SystemExit('index.html closing body tag not found')
+          text=text[:pos]+dynamic+'\n'+text[pos:]
           payload=json.dumps({'message':'Connect homepage carousel to Supabase products','content':base64.b64encode(text.encode()).decode(),'sha':obj['sha'],'branch':'main'}).encode()
           put=urllib.request.Request(api,data=payload,method='PUT',headers={'Authorization':f"Bearer {os.environ['GH_TOKEN']}",'Accept':'application/vnd.github+json','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'})
           with urllib.request.urlopen(put) as r: print(r.read().decode())
