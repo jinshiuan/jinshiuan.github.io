@@ -12,28 +12,27 @@ jobs:
   connect-carousel:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
       - name: Patch homepage carousel
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
-          import base64, json, os, re, urllib.request
-          repo=os.environ['GITHUB_REPOSITORY']
-          api=f'https://api.github.com/repos/{repo}/contents/index.html?ref=main'
-          req=urllib.request.Request(api,headers={'Authorization':f"Bearer {os.environ['GH_TOKEN']}",'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
-          with urllib.request.urlopen(req) as r: obj=json.load(r)
-          text=base64.b64decode(obj['content']).decode('utf-8')
+          import re
+          from pathlib import Path
+          index=Path('index.html')
+          text=index.read_text(encoding='utf-8')
           marker_start='<script id="jinshiuan-cloud-carousel">'
           marker_end='</script>'
           if marker_start in text:
               a=text.find(marker_start); b=text.find(marker_end,a)
               if b<0: raise SystemExit('Existing cloud carousel script is incomplete')
               text=text[:a]+text[b+len(marker_end):]
-          admin_api=f'https://api.github.com/repos/{repo}/contents/admin.html?ref=main'
-          areq=urllib.request.Request(admin_api,headers={'Authorization':f"Bearer {os.environ['GH_TOKEN']}",'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
-          with urllib.request.urlopen(areq) as r: admin=json.load(r)
-          admin_text=base64.b64decode(admin['content']).decode('utf-8')
-          km=re.search(r"SUPABASE_PUBLISHABLE_KEY=['\"]([^'\"]+)['\"]",admin_text)
+          admin=Path('admin.html').read_text(encoding='utf-8')
+          km=re.search(r"SUPABASE_PUBLISHABLE_KEY=['\"]([^'\"]+)['\"]",admin)
           if not km: raise SystemExit('Could not read the existing Supabase publishable key from admin.html')
           supabase_key=km.group(1)
           dynamic=r'''<script id="jinshiuan-cloud-carousel">
@@ -56,7 +55,17 @@ jobs:
           pos=text.rfind('</body')
           if pos<0: raise SystemExit('index.html body tag not found')
           text=text[:pos]+dynamic+'\n'+text[pos:]
-          payload=json.dumps({'message':'Connect homepage carousel to Supabase products','content':base64.b64encode(text.encode()).decode(),'sha':obj['sha'],'branch':'main'}).encode()
-          put=urllib.request.Request(api,data=payload,method='PUT',headers={'Authorization':f"Bearer {os.environ['GH_TOKEN']}",'Accept':'application/vnd.github+json','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'})
-          with urllib.request.urlopen(put) as r: print(r.read().decode())
+          index.write_text(text,encoding='utf-8')
           PY
+
+      - name: Commit homepage carousel connection
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No homepage carousel changes needed."
+            exit 0
+          fi
+          git commit -m "Connect homepage carousel to cloud products"
+          git push origin main
