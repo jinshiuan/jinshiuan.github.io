@@ -1,1 +1,1 @@
-trigger homepage carousel cloud connection v2
+trigger homepage carousel cloud connection v3
