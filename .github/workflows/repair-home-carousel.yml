@@ -1,0 +1,45 @@
+name: Repair homepage carousel
+on:
+  push:
+    paths:
+      - '.github/carousel-repair.trigger'
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          blocks=re.findall(r'<script\b[^>]*>.*?</script>',s,re.I|re.S)
+          for b in blocks:
+              if 'HOME_CAROUSEL_IMAGES' in b or 'jinshiuan-cloud-carousel' in b:
+                  s=s.replace(b,'')
+          script=r'''<!-- JINSHIUAN STABLE HOME CAROUSEL -->
+          <script>
+          (()=>{
+            const fallback=[...Array(14)].map((_,i)=>`assets/image-${String(i+1).padStart(2,'0')}.webp`);
+            const url=(s.match(/https:\/\/[^'"\\s]+supabase\.co/)||[])[0]||'';
+            const key=(s.match(/sb_publishable_[A-Za-z0-9_-]+/)||[])[0]||'';
+            let images=fallback.slice(),idx=0,timer;
+            const $=id=>document.getElementById(id);
+            function render(){const v=$('homeCarouselViewport'),d=$('homeCarouselDots');if(!v||!d)return;v.innerHTML=images.map((x,i)=>`<div class="home-carousel-slide${i===idx?' active':''}"><img src="${x.replace(/"/g,'&quot;')}" alt="Featured Product ${i+1}" loading="lazy"></div>`).join('');d.innerHTML=images.map((_,i)=>`<button class="home-carousel-dot${i===idx?' active':''}" type="button" data-index="${i}"></button>`).join('');d.querySelectorAll('button').forEach(b=>b.onclick=()=>{idx=+b.dataset.index;render();restart()});const p=$('homeCarouselPrev'),n=$('homeCarouselNext');if(p)p.onclick=()=>{idx=(idx-1+images.length)%images.length;render();restart()};if(n)n.onclick=()=>{idx=(idx+1)%images.length;render();restart()}}
+            function restart(){clearInterval(timer);timer=setInterval(()=>{idx=(idx+1)%images.length;render()},4000)}
+            async function load(){try{const r=await fetch(url+'/rest/v1/products?select=images,sort_order&active=eq.true&order=sort_order.asc',{headers:{apikey:key,Authorization:'Bearer '+key},cache:'no-store'});if(!r.ok)throw Error(r.status);const rows=await r.json(),cloud=[];for(const p of rows||[])for(const x of (Array.isArray(p.images)?p.images:[])){if(typeof x==='string'&&x.trim()&&!cloud.includes(x.trim()))cloud.push(x.trim())}images=fallback.concat(cloud.filter(x=>!fallback.includes(x)))}catch(e){images=fallback.slice()}render();restart()}
+            function init(){render();restart();load()};document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
+          })();
+          </script>'''
+          s=s.replace('</body>',script+'\n</body>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Repair homepage carousel image loading'
+          git push
