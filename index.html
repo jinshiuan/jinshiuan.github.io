@@ -140,35 +140,51 @@
 }
 </style>
 <style id="jinshiuan-brand-name-style">
-header:has(.site-brand-name-img){min-height:92px !important;height:92px !important;overflow:visible !important;}
+header:has(.site-brand-name-img){
+  position:relative !important;
+  min-height:92px !important;
+  height:92px !important;
+  overflow:visible !important;
+}
 .site-brand-name-img{
+  position:absolute !important;
+  left:540px !important;
+  top:9px !important;
   display:block !important;
   width:390px !important;
-  height:72px !important;
-  max-width:390px !important;
-  max-height:72px !important;
-  min-width:390px !important;
-  min-height:72px !important;
-  object-fit:fill !important;
+  height:auto !important;
+  max-width:none !important;
+  max-height:none !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  object-fit:contain !important;
   object-position:center center !important;
-  margin-left:14px !important;
-  margin-top:4px !important;
-  margin-bottom:0 !important;
-  flex:0 0 390px !important;
-  line-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  flex:none !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  filter:none !important;
+  backdrop-filter:none !important;
+  -webkit-filter:none !important;
+  mask:none !important;
+  -webkit-mask:none !important;
+  mix-blend-mode:normal !important;
+  clip-path:none !important;
+  image-rendering:auto !important;
+  line-height:normal !important;
+  z-index:99999 !important;
+  isolation:isolate !important;
 }
 @media(max-width:700px){
-  header:has(.site-brand-name-img){min-height:72px !important;height:72px !important;}
+  header:has(.site-brand-name-img){
+    min-height:72px !important;
+    height:72px !important;
+  }
   .site-brand-name-img{
+    left:145px !important;
+    top:8px !important;
     width:250px !important;
-    height:48px !important;
-    max-width:250px !important;
-    max-height:48px !important;
-    min-width:250px !important;
-    min-height:48px !important;
-    flex-basis:250px !important;
-    margin-left:8px !important;
-    margin-top:2px !important;
   }
 }
 </style>
@@ -188,7 +204,7 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 </script>
 </head><body>
-<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-logo-header.webp?v=52fdc0c589fc10890ffa99e25bf5450d45e127d5" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v=52fdc0c589fc10890ffa99e25bf5450d45e127d5" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
+<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-logo-header.webp?v=2c07ce4e691f4087379fa439991a3d1a5781cb36" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v=2c07ce4e691f4087379fa439991a3d1a5781cb36" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
 <main><section class="hero"><div class="wrap hero-inner">
 <div class="hero-product"><div class="hero-static"><img src="assets/jinshiuan-building-new(1).png?v=2026092101" alt="JINSHIUAN Factory Building" loading="eager"></div></div>
 <div class="hero-copy"><div class="kicker">JINSHIUAN</div><h1>AUTO<br>PARTS</h1><p>Parts Development · Sourcing · Export</p><a class="btn" href="#products">VIEW PRODUCTS</a></div>
