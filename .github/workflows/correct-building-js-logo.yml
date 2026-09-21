@@ -27,17 +27,28 @@ jobs:
           pattern = r'<img src="(?:data:image/webp;base64,[^"]+|assets/jinshiuan-logo-header\.webp(?:\?v=[^"]+)?)"'
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
+
+          # Add the company name beside the website logo without changing other page settings.
+          if 'class="site-brand-name"' not in s:
+              brand_css = '''<style id="jinshiuan-brand-name-style">
+          .site-brand-name{display:inline-block;margin-left:14px;font-size:24px;font-weight:700;line-height:1.15;letter-spacing:.4px;color:#111;white-space:nowrap;vertical-align:middle}
+          @media(max-width:700px){.site-brand-name{font-size:17px;margin-left:8px}}
+          </style>'''
+              s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
+              img_pattern = r'(<img src="assets/jinshiuan-logo-header\.webp\?v=[^"]+"[^>]*>)'
+              s = re.sub(img_pattern, r'\1<span class="site-brand-name">JINSHIUAN AUTO PARTS LTD.</span>', s, count=1)
+
           p.write_text(s, encoding='utf-8')
           PY
           sed -E -i "s#assets/jinshiuan-building\.png\?v=[^\"]+#assets/jinshiuan-building.png?v=${GITHUB_SHA}#g" index.html
-      - name: Commit selected building image, logo and cache refresh
+      - name: Commit selected building image, logo, company name and cache refresh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html
           if git diff --cached --quiet; then
-            echo "Building image, logo and cache version are already current."
+            echo "Building image, logo, company name and cache version are already current."
             exit 0
           fi
-          git commit -m "Update JINSHIUAN website logo"
+          git commit -m "Add JINSHIUAN company name beside website logo"
           git push
