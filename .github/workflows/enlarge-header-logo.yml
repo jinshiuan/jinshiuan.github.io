@@ -1,0 +1,38 @@
+name: Enlarge header logo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/enlarge-header-logo.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  enlarge-logo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add proportional header logo enlargement
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '<!-- JINSHIUAN_HEADER_LOGO_ENLARGE -->'
+          if marker not in s:
+              patch = '''\n<!-- JINSHIUAN_HEADER_LOGO_ENLARGE -->\n<style>\n@media (min-width: 769px) {\n  body > header img, header img {\n    transform: scale(1.12) !important;\n    transform-origin: center center !important;\n  }\n}\n</style>\n<script>\ndocument.addEventListener('DOMContentLoaded', function () {\n  const candidates = Array.from(document.images).filter(function (img) {\n    const r = img.getBoundingClientRect();\n    return r.top >= -20 && r.top < 190 && r.width > 250;\n  });\n  candidates.forEach(function (img) {\n    img.style.setProperty('transform', 'scale(1.12)', 'important');\n    img.style.setProperty('transform-origin', 'center center', 'important');\n  });\n});\n</script>\n'''
+              s = s.replace('</head>', patch + '</head>', 1)
+              p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit website change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Enlarge header logo proportionally"
+          git push
