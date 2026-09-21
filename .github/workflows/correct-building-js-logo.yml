@@ -24,7 +24,7 @@ jobs:
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
           cache = os.environ['GITHUB_SHA']
-          pattern = r'<img src="(?:data:image/webp;base64,[^"]+|assets/jinshiuan-logo-header\\.webp(?:\\?v=[^"]+)?)"'
+          pattern = r'<img src="(?:data:image/webp;base64,[^"]+|assets/jinshiuan-logo-header\.webp(?:\?v=[^"]+)?)"'
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
@@ -37,17 +37,18 @@ jobs:
               s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
 
           img_tag = f'<img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v={cache}" alt="JINSHIUAN AUTO PARTS LTD." loading="eager">'
+          old_img = '<span class="site-brand-name">JINSHIUAN AUTO PARTS LTD.</span>'
           if 'class="site-brand-name-img"' in s:
               s = re.sub(r'<img class="site-brand-name-img"[^>]*>', img_tag, s, count=1)
-          elif 'class="site-brand-name"' in s:
-              s = re.sub(r'<span class="site-brand-name">JINSHIUAN AUTO PARTS LTD\\.</span>', img_tag, s, count=1)
+          elif old_img in s:
+              s = s.replace(old_img, img_tag, 1)
           else:
-              img_pattern = r'(<img src="assets/jinshiuan-logo-header\\.webp\\?v=[^"]+"[^>]*>)'
+              img_pattern = r'(<img src="assets/jinshiuan-logo-header\.webp\?v=[^"]+"[^>]*>)'
               s = re.sub(img_pattern, r'\1' + img_tag, s, count=1)
 
           p.write_text(s, encoding='utf-8')
           PY
-          sed -E -i "s#assets/jinshiuan-building\\.png\\?v=[^\"]+#assets/jinshiuan-building.png?v=${GITHUB_SHA}#g" index.html
+          sed -E -i "s#assets/jinshiuan-building\.png\?v=[^\"]+#assets/jinshiuan-building.png?v=${GITHUB_SHA}#g" index.html
       - name: Commit selected building image, logo, company name graphic and cache refresh
         run: |
           git config user.name "github-actions[bot]"
