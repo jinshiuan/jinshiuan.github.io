@@ -12,18 +12,28 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply selected building image and refresh cache version
+      - name: Apply selected building image, logo and refresh cache version
         run: |
           cp 'assets/jinshiuan-building-new(1).png' assets/jinshiuan-building.png
+          python - <<'PY'
+          import base64, re
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          logo = Path('assets/jinshiuan-logo-header.webp').read_bytes()
+          data = base64.b64encode(logo).decode('ascii')
+          s = re.sub(r'<img src="data:image/webp;base64,[^"]+"', '<img src="assets/jinshiuan-logo-header.webp?v=${GITHUB_SHA}"', s, count=1)
+          p.write_text(s, encoding='utf-8')
+          PY
           sed -E -i "s#assets/jinshiuan-building\.png\?v=[^\"]+#assets/jinshiuan-building.png?v=${GITHUB_SHA}#g" index.html
-      - name: Commit selected building image and cache refresh
+      - name: Commit selected building image, logo and cache refresh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/jinshiuan-building.png index.html
           if git diff --cached --quiet; then
-            echo "Building image and cache version are already current."
+            echo "Building image, logo and cache version are already current."
             exit 0
           fi
-          git commit -m "Apply new building image and refresh cache"
+          git commit -m "Apply new website logo and refresh cache"
           git push
