@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply selected building image, logo and refresh cache version
+      - name: Apply selected building image, logo and company name graphic
         run: |
           cp 'assets/jinshiuan-building-new(1).png' assets/jinshiuan-building.png
           if [ -f 'assets/jinshiuan-logo-new.webp' ]; then
@@ -24,31 +24,38 @@ jobs:
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
           cache = os.environ['GITHUB_SHA']
-          pattern = r'<img src="(?:data:image/webp;base64,[^"]+|assets/jinshiuan-logo-header\.webp(?:\?v=[^"]+)?)"'
+          pattern = r'<img src="(?:data:image/webp;base64,[^"]+|assets/jinshiuan-logo-header\\.webp(?:\\?v=[^"]+)?)"'
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # Add the company name beside the website logo without changing other page settings.
-          if 'class="site-brand-name"' not in s:
-              brand_css = '''<style id="jinshiuan-brand-name-style">
-          .site-brand-name{display:inline-block;margin-left:14px;font-size:24px;font-weight:700;line-height:1.15;letter-spacing:.4px;color:#111;white-space:nowrap;vertical-align:middle}
-          @media(max-width:700px){.site-brand-name{font-size:17px;margin-left:8px}}
+          # Put the uploaded JINSHIUAN AUTO PARTS LTD. graphic beside the existing logo.
+          brand_css = '''<style id="jinshiuan-brand-name-style">
+          .site-brand-name-img{display:inline-block;margin-left:14px;height:42px;width:auto;max-width:300px;object-fit:contain;vertical-align:middle}
+          @media(max-width:700px){.site-brand-name-img{height:30px;max-width:210px;margin-left:8px}}
           </style>'''
+          if 'id="jinshiuan-brand-name-style"' not in s:
               s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
-              img_pattern = r'(<img src="assets/jinshiuan-logo-header\.webp\?v=[^"]+"[^>]*>)'
-              s = re.sub(img_pattern, r'\1<span class="site-brand-name">JINSHIUAN AUTO PARTS LTD.</span>', s, count=1)
+
+          img_tag = f'<img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v={cache}" alt="JINSHIUAN AUTO PARTS LTD." loading="eager">'
+          if 'class="site-brand-name-img"' in s:
+              s = re.sub(r'<img class="site-brand-name-img"[^>]*>', img_tag, s, count=1)
+          elif 'class="site-brand-name"' in s:
+              s = re.sub(r'<span class="site-brand-name">JINSHIUAN AUTO PARTS LTD\\.</span>', img_tag, s, count=1)
+          else:
+              img_pattern = r'(<img src="assets/jinshiuan-logo-header\\.webp\\?v=[^"]+"[^>]*>)'
+              s = re.sub(img_pattern, r'\1' + img_tag, s, count=1)
 
           p.write_text(s, encoding='utf-8')
           PY
-          sed -E -i "s#assets/jinshiuan-building\.png\?v=[^\"]+#assets/jinshiuan-building.png?v=${GITHUB_SHA}#g" index.html
-      - name: Commit selected building image, logo, company name and cache refresh
+          sed -E -i "s#assets/jinshiuan-building\\.png\\?v=[^\"]+#assets/jinshiuan-building.png?v=${GITHUB_SHA}#g" index.html
+      - name: Commit selected building image, logo, company name graphic and cache refresh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html
+          git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html assets/jinshiuan-company-name.webp
           if git diff --cached --quiet; then
-            echo "Building image, logo, company name and cache version are already current."
+            echo "Building image, logo, company name graphic and cache version are already current."
             exit 0
           fi
-          git commit -m "Add JINSHIUAN company name beside website logo"
+          git commit -m "Use company name graphic beside website logo"
           git push
