@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply selected building image, logo and company name graphic
+      - name: Apply selected building image, logo and company name
         run: |
           cp 'assets/jinshiuan-building-new(1).png' assets/jinshiuan-building.png
           if [ -f 'assets/jinshiuan-logo-new.webp' ]; then
@@ -25,101 +25,48 @@ jobs:
           s = p.read_text(encoding='utf-8')
           cache = os.environ['GITHUB_SHA']
 
-          # Remove all earlier company-name injection blocks so only one implementation remains.
+          # Remove all previous company-name implementations.
           s = re.sub(r'<style id="jinshiuan-company-name-fix">.*?</style>\s*<script id="jinshiuan-company-name-script">.*?</script>\s*', '', s, flags=re.S)
           s = re.sub(r'<span class="site-header-company-name">\s*<img[^>]*>\s*</span>', '', s, flags=re.S)
           s = re.sub(r'<style id="jinshiuan-brand-name-style">.*?</style>\s*', '', s, flags=re.S)
           s = re.sub(r'<img class="site-brand-name-img"[^>]*>', '', s)
+          s = re.sub(r'<span class="site-brand-name-wrap">.*?</span>', '', s, flags=re.S)
 
-          # Refresh the existing header logo without changing its artwork.
+          # Refresh the existing logo.
           pattern = r'<img src="(?:data:image/webp;base64,[^"]+|assets/jinshiuan-logo-header\.webp(?:\?v=[^"]+)?)"'
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # The header clips the lower part of the supplied company-name artwork if its
-          # height is too small. Give the header enough vertical room and keep the image
-          # at its natural aspect ratio. Keep the requested ~5 cm horizontal gap.
+          # Keep the supplied JINSHIUAN artwork only for the top word. The lower
+          # line in that raster asset is visibly washed out, so render AUTO PARTS LTD.
+          # as crisp HTML text instead of displaying the faded raster text.
           brand_css = '''<style id="jinshiuan-brand-name-style">
-          .topbar{
-            min-height:140px !important;
-            height:140px !important;
-            overflow:visible !important;
-            position:relative !important;
-          }
-          .brand{
-            display:flex !important;
-            align-items:center !important;
-            gap:5cm !important;
-            height:140px !important;
-            flex:0 1 auto !important;
-            min-width:0 !important;
-            overflow:visible !important;
-            position:relative !important;
-            z-index:20 !important;
-          }
-          .brand > img:first-child{
-            display:block !important;
-            width:110px !important;
-            height:78px !important;
-            max-width:110px !important;
-            max-height:78px !important;
-            object-fit:contain !important;
-            object-position:center center !important;
-            flex:0 0 110px !important;
-            opacity:1 !important;
-            visibility:visible !important;
-          }
-          .brand .site-brand-name-img{
-            display:block !important;
-            position:relative !important;
-            z-index:21 !important;
-            width:360px !important;
-            height:auto !important;
-            max-width:360px !important;
-            max-height:none !important;
-            margin:0 !important;
-            padding:0 !important;
-            flex:0 0 360px !important;
-            object-fit:contain !important;
-            object-position:center center !important;
-            opacity:1 !important;
-            visibility:visible !important;
-            filter:none !important;
-            -webkit-filter:none !important;
-            mix-blend-mode:normal !important;
-            clip-path:none !important;
-            overflow:visible !important;
-          }
-          @media(max-width:1100px){
-            .topbar{min-height:125px !important;height:125px !important}
-            .brand{gap:24px !important;height:125px !important}
-            .brand > img:first-child{width:100px !important;max-width:100px !important;flex-basis:100px !important}
-            .brand .site-brand-name-img{width:300px !important;max-width:300px !important;flex-basis:300px !important}
-          }
-          @media(max-width:700px){
-            .topbar{min-height:90px !important;height:90px !important}
-            .brand{gap:12px !important;height:90px !important}
-            .brand > img:first-child{width:82px !important;height:60px !important;max-width:82px !important;max-height:60px !important;flex-basis:82px !important}
-            .brand .site-brand-name-img{width:210px !important;max-width:210px !important;flex-basis:210px !important}
-          }
+          .topbar{min-height:140px !important;height:140px !important;overflow:visible !important;position:relative !important}
+          .brand{display:flex !important;align-items:center !important;gap:5cm !important;height:140px !important;flex:0 1 auto !important;min-width:0 !important;overflow:visible !important;position:relative !important;z-index:20 !important}
+          .brand > img:first-child{display:block !important;width:110px !important;height:78px !important;max-width:110px !important;max-height:78px !important;object-fit:contain !important;object-position:center center !important;flex:0 0 110px !important;opacity:1 !important;visibility:visible !important}
+          .brand .site-brand-name-wrap{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;width:360px !important;max-width:360px !important;height:92px !important;flex:0 0 360px !important;overflow:visible !important;position:relative !important;z-index:21 !important}
+          .brand .site-brand-name-top{display:block !important;width:360px !important;height:60px !important;overflow:hidden !important;position:relative !important}
+          .brand .site-brand-name-top img{display:block !important;width:360px !important;height:auto !important;max-width:none !important;max-height:none !important;margin:0 !important;padding:0 !important;object-fit:contain !important;object-position:top center !important;opacity:1 !important;filter:none !important;-webkit-filter:none !important}
+          .brand .site-brand-name-bottom{display:block !important;margin-top:3px !important;color:#111 !important;font-family:Arial,Helvetica,sans-serif !important;font-size:20px !important;line-height:24px !important;font-weight:700 !important;letter-spacing:3px !important;white-space:nowrap !important;text-align:center !important;opacity:1 !important;visibility:visible !important}
+          @media(max-width:1100px){.topbar{min-height:125px !important;height:125px !important}.brand{gap:24px !important;height:125px !important}.brand > img:first-child{width:100px !important;max-width:100px !important;flex-basis:100px !important}.brand .site-brand-name-wrap{width:300px !important;max-width:300px !important;flex-basis:300px !important}.brand .site-brand-name-top{width:300px !important}.brand .site-brand-name-top img{width:300px !important}.brand .site-brand-name-bottom{font-size:17px !important;line-height:21px !important;letter-spacing:2.5px !important}}
+          @media(max-width:700px){.topbar{min-height:90px !important;height:90px !important}.brand{gap:12px !important;height:90px !important}.brand > img:first-child{width:82px !important;height:60px !important;max-width:82px !important;max-height:60px !important;flex-basis:82px !important}.brand .site-brand-name-wrap{width:210px !important;max-width:210px !important;flex-basis:210px !important;height:70px !important}.brand .site-brand-name-top{width:210px !important;height:42px !important}.brand .site-brand-name-top img{width:210px !important}.brand .site-brand-name-bottom{font-size:12px !important;line-height:16px !important;letter-spacing:1.5px !important;margin-top:1px !important}}
           </style>'''
           s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
 
-          img_tag = f'<img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v={cache}" alt="JINSHIUAN AUTO PARTS LTD." loading="eager">'
+          wrapper = f'<span class="site-brand-name-wrap"><span class="site-brand-name-top"><img src="assets/jinshiuan-company-name.webp?v={cache}" alt="JINSHIUAN" loading="eager"></span><span class="site-brand-name-bottom">AUTO PARTS LTD.</span></span>'
           img_pattern = r'(<img src="assets/jinshiuan-logo-header\.webp\?v=[^"]+"[^>]*>)'
-          s = re.sub(img_pattern, r'\1' + img_tag, s, count=1)
-
+          s = re.sub(img_pattern, r'\1' + wrapper, s, count=1)
           p.write_text(s, encoding='utf-8')
           PY
           sed -E -i "s#assets/jinshiuan-building\.png\?v=[^\"]+#assets/jinshiuan-building.png?v=${GITHUB_SHA}#g" index.html
-      - name: Commit selected building image, logo, company name graphic and cache refresh
+      - name: Commit selected building image, logo and company name
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html assets/jinshiuan-company-name.webp
           if git diff --cached --quiet; then
-            echo "Building image, logo, company name graphic and cache version are already current."
+            echo "No changes needed."
             exit 0
           fi
-          git commit -m "Fix company name vertical clipping in header"
+          git commit -m "Fix company name clarity in header"
           git push
