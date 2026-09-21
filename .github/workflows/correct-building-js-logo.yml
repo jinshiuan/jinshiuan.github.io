@@ -25,9 +25,7 @@ jobs:
           s = p.read_text(encoding='utf-8')
           cache = os.environ['GITHUB_SHA']
 
-          # Remove all earlier company-name injection blocks so only one clean
-          # implementation remains. This prevents competing CSS/JS from making
-          # AUTO PARTS LTD. look faded or putting the artwork far from the logo.
+          # Remove all earlier company-name injection blocks so only one clean implementation remains.
           s = re.sub(r'<style id="jinshiuan-company-name-fix">.*?</style>\s*<script id="jinshiuan-company-name-script">.*?</script>\s*', '', s, flags=re.S)
           s = re.sub(r'<span class="site-header-company-name">\s*<img[^>]*>\s*</span>', '', s, flags=re.S)
           s = re.sub(r'<style id="jinshiuan-brand-name-style">.*?</style>\s*', '', s, flags=re.S)
@@ -38,9 +36,8 @@ jobs:
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # Final header layout: the supplied 2000x355 artwork is displayed at
-          # native proportions. It is positioned about 5 cm to the right of the
-          # existing logo on desktop, with no fade/mask/filter/clipping.
+          # Final header layout. The supplied 2000x355 artwork keeps its native ratio.
+          # Desktop placement is approximately 5 cm to the right of the existing logo.
           brand_css = '''<style id="jinshiuan-brand-name-style">
           header:has(.site-brand-name-img){
             position:relative !important;
@@ -99,7 +96,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html assets/jinshiuan-company-name.webp .github/workflows/fix-header-company-name.yml
+          git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html assets/jinshiuan-company-name.webp
           if git diff --cached --quiet; then
             echo "Building image, logo, company name graphic and cache version are already current."
             exit 0
