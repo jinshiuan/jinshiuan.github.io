@@ -25,7 +25,7 @@ jobs:
           s = p.read_text(encoding='utf-8')
           cache = os.environ['GITHUB_SHA']
 
-          # Remove all earlier company-name injection blocks so only one clean implementation remains.
+          # Remove all earlier company-name injection blocks so only one implementation remains.
           s = re.sub(r'<style id="jinshiuan-company-name-fix">.*?</style>\s*<script id="jinshiuan-company-name-script">.*?</script>\s*', '', s, flags=re.S)
           s = re.sub(r'<span class="site-header-company-name">\s*<img[^>]*>\s*</span>', '', s, flags=re.S)
           s = re.sub(r'<style id="jinshiuan-brand-name-style">.*?</style>\s*', '', s, flags=re.S)
@@ -36,51 +36,66 @@ jobs:
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # Final header layout. The supplied 2000x355 artwork keeps its native ratio.
-          # Desktop placement is approximately 5 cm to the right of the existing logo.
+          # IMPORTANT: the real header uses .topbar/.brand, not a <header> element.
+          # Keep the original logo at a controlled size, then place the supplied company-name
+          # artwork beside it with a literal 5 cm gap. Do not stretch the artwork vertically.
           brand_css = '''<style id="jinshiuan-brand-name-style">
-          header:has(.site-brand-name-img){
-            position:relative !important;
-            min-height:92px !important;
-            height:92px !important;
+          .topbar{
+            min-height:100px !important;
+            height:100px !important;
             overflow:visible !important;
           }
-          .site-brand-name-img{
-            position:absolute !important;
-            left:540px !important;
-            top:9px !important;
+          .brand{
+            display:flex !important;
+            align-items:center !important;
+            gap:5cm !important;
+            height:100px !important;
+            flex:0 1 auto !important;
+            min-width:0 !important;
+            overflow:visible !important;
+          }
+          .brand > img:first-child{
             display:block !important;
-            width:390px !important;
+            width:110px !important;
+            height:78px !important;
+            max-width:110px !important;
+            max-height:78px !important;
+            object-fit:contain !important;
+            object-position:center center !important;
+            flex:0 0 110px !important;
+            opacity:1 !important;
+            visibility:visible !important;
+          }
+          .brand .site-brand-name-img{
+            display:block !important;
+            position:static !important;
+            width:360px !important;
             height:auto !important;
-            max-width:none !important;
+            max-width:360px !important;
             max-height:none !important;
             margin:0 !important;
             padding:0 !important;
-            flex:none !important;
+            flex:0 0 360px !important;
+            object-fit:contain !important;
+            object-position:left center !important;
             opacity:1 !important;
             visibility:visible !important;
             filter:none !important;
-            backdrop-filter:none !important;
             -webkit-filter:none !important;
-            mask:none !important;
-            -webkit-mask:none !important;
             mix-blend-mode:normal !important;
             clip-path:none !important;
-            object-fit:contain !important;
             image-rendering:auto !important;
-            z-index:99999 !important;
-            isolation:isolate !important;
+          }
+          @media(max-width:1100px){
+            .brand{gap:24px !important}
+            .brand > img:first-child{width:100px !important;max-width:100px !important;flex-basis:100px !important}
+            .brand .site-brand-name-img{width:300px !important;max-width:300px !important;flex-basis:300px !important}
           }
           @media(max-width:700px){
-            header:has(.site-brand-name-img){
-              min-height:72px !important;
-              height:72px !important;
-            }
-            .site-brand-name-img{
-              left:145px !important;
-              top:8px !important;
-              width:250px !important;
-            }
+            .topbar{min-height:72px !important;height:72px !important}
+            .brand{gap:12px !important;height:72px !important}
+            .brand > img:first-child{width:82px !important;height:60px !important;max-width:82px !important;max-height:60px !important;flex-basis:82px !important}
+            .brand .site-brand-name-img{width:210px !important;max-width:210px !important;flex-basis:210px !important}
           }
           </style>'''
           s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
@@ -101,5 +116,5 @@ jobs:
             echo "Building image, logo, company name graphic and cache version are already current."
             exit 0
           fi
-          git commit -m "Finalize company name header layout"
+          git commit -m "Fix header logo and company name spacing"
           git push
