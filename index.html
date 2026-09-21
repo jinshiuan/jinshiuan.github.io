@@ -143,6 +143,21 @@
 .site-brand-name{display:inline-block;margin-left:14px;font-size:24px;font-weight:700;line-height:1.15;letter-spacing:.4px;color:#111;white-space:nowrap;vertical-align:middle}
 @media(max-width:700px){.site-brand-name{font-size:17px;margin-left:8px}}
 </style>
+<style id="jinshiuan-company-name-fix">
+.site-header-company-name{display:inline-flex!important;align-items:center!important;margin-left:14px!important;height:52px!important;max-width:360px!important;width:auto!important;vertical-align:middle!important;}
+.site-header-company-name img{display:block!important;height:52px!important;width:auto!important;max-width:360px!important;object-fit:contain!important;}
+@media(max-width:700px){.site-header-company-name{height:34px!important;max-width:230px!important;margin-left:8px!important}.site-header-company-name img{height:34px!important;max-width:230px!important}}
+</style>
+<script id="jinshiuan-company-name-script">
+document.addEventListener('DOMContentLoaded',function(){
+  const src='assets/jinshiuan-company-name.webp?v='+Date.now();
+  const els=[...document.querySelectorAll('header *, nav *, body *')];
+  const target=els.find(e=>e.children.length===0 && e.textContent.trim()==='JINSHIUAN AUTO PARTS LTD.');
+  if(target){target.outerHTML='<span class="site-header-company-name"><img src="'+src+'" alt="JINSHIUAN AUTO PARTS LTD."></span>';return;}
+  const logo=[...document.images].find(i=>/jinshiuan|logo/i.test(i.alt+' '+i.src));
+  if(logo && logo.parentElement && !document.querySelector('.site-header-company-name')){logo.insertAdjacentHTML('afterend','<span class="site-header-company-name"><img src="'+src+'" alt="JINSHIUAN AUTO PARTS LTD."></span>');}
+});
+</script>
 </head><body>
 <header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-logo-header.webp?v=900a0a7b9e6055764f257818b0ff524c41e93e25" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v=900a0a7b9e6055764f257818b0ff524c41e93e25" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
 <main><section class="hero"><div class="wrap hero-inner">
