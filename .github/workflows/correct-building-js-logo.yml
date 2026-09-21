@@ -24,13 +24,23 @@ jobs:
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
           cache = os.environ['GITHUB_SHA']
+
+          # Remove all earlier company-name injection blocks so only one clean
+          # implementation remains. This prevents competing CSS/JS from making
+          # AUTO PARTS LTD. look faded or putting the artwork far from the logo.
+          s = re.sub(r'<style id="jinshiuan-company-name-fix">.*?</style>\s*<script id="jinshiuan-company-name-script">.*?</script>\s*', '', s, flags=re.S)
+          s = re.sub(r'<span class="site-header-company-name">\s*<img[^>]*>\s*</span>', '', s, flags=re.S)
+          s = re.sub(r'<style id="jinshiuan-brand-name-style">.*?</style>\s*', '', s, flags=re.S)
+          s = re.sub(r'<img class="site-brand-name-img"[^>]*>', '', s)
+
+          # Refresh the existing header logo without changing its artwork.
           pattern = r'<img src="(?:data:image/webp;base64,[^"]+|assets/jinshiuan-logo-header\.webp(?:\?v=[^"]+)?)"'
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # The supplied company-name artwork is kept unchanged.
-          # Position it explicitly beside the existing logo instead of letting
-          # the site's flex/image rules stretch, fade or clip its second line.
+          # Final header layout: the supplied 2000x355 artwork is displayed at
+          # native proportions. It is positioned about 5 cm to the right of the
+          # existing logo on desktop, with no fade/mask/filter/clipping.
           brand_css = '''<style id="jinshiuan-brand-name-style">
           header:has(.site-brand-name-img){
             position:relative !important;
@@ -47,10 +57,6 @@ jobs:
             height:auto !important;
             max-width:none !important;
             max-height:none !important;
-            min-width:0 !important;
-            min-height:0 !important;
-            object-fit:contain !important;
-            object-position:center center !important;
             margin:0 !important;
             padding:0 !important;
             flex:none !important;
@@ -63,8 +69,8 @@ jobs:
             -webkit-mask:none !important;
             mix-blend-mode:normal !important;
             clip-path:none !important;
+            object-fit:contain !important;
             image-rendering:auto !important;
-            line-height:normal !important;
             z-index:99999 !important;
             isolation:isolate !important;
           }
@@ -80,20 +86,11 @@ jobs:
             }
           }
           </style>'''
-          if 'id="jinshiuan-brand-name-style"' not in s:
-              s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
-          else:
-              s = re.sub(r'<style id="jinshiuan-brand-name-style">.*?</style>', brand_css.strip(), s, count=1, flags=re.S)
+          s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
 
           img_tag = f'<img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v={cache}" alt="JINSHIUAN AUTO PARTS LTD." loading="eager">'
-          old_img = '<span class="site-brand-name">JINSHIUAN AUTO PARTS LTD.</span>'
-          if 'class="site-brand-name-img"' in s:
-              s = re.sub(r'<img class="site-brand-name-img"[^>]*>', img_tag, s, count=1)
-          elif old_img in s:
-              s = s.replace(old_img, img_tag, 1)
-          else:
-              img_pattern = r'(<img src="assets/jinshiuan-logo-header\.webp\?v=[^"]+"[^>]*>)'
-              s = re.sub(img_pattern, r'\1' + img_tag, s, count=1)
+          img_pattern = r'(<img src="assets/jinshiuan-logo-header\.webp\?v=[^"]+"[^>]*>)'
+          s = re.sub(img_pattern, r'\1' + img_tag, s, count=1)
 
           p.write_text(s, encoding='utf-8')
           PY
@@ -102,10 +99,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html assets/jinshiuan-company-name.webp
+          git add assets/jinshiuan-building.png assets/jinshiuan-logo-header.webp index.html assets/jinshiuan-company-name.webp .github/workflows/fix-header-company-name.yml
           if git diff --cached --quiet; then
             echo "Building image, logo, company name graphic and cache version are already current."
             exit 0
           fi
-          git commit -m "Fix company name header position and clarity"
+          git commit -m "Finalize company name header layout"
           git push
