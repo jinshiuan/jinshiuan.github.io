@@ -36,23 +36,26 @@ jobs:
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # IMPORTANT: the real header uses .topbar/.brand, not a <header> element.
-          # Keep the original logo at a controlled size, then place the supplied company-name
-          # artwork beside it with a literal 5 cm gap. Do not stretch the artwork vertically.
+          # The header clips the lower part of the supplied company-name artwork if its
+          # height is too small. Give the header enough vertical room and keep the image
+          # at its natural aspect ratio. Keep the requested ~5 cm horizontal gap.
           brand_css = '''<style id="jinshiuan-brand-name-style">
           .topbar{
-            min-height:100px !important;
-            height:100px !important;
+            min-height:140px !important;
+            height:140px !important;
             overflow:visible !important;
+            position:relative !important;
           }
           .brand{
             display:flex !important;
             align-items:center !important;
             gap:5cm !important;
-            height:100px !important;
+            height:140px !important;
             flex:0 1 auto !important;
             min-width:0 !important;
             overflow:visible !important;
+            position:relative !important;
+            z-index:20 !important;
           }
           .brand > img:first-child{
             display:block !important;
@@ -68,7 +71,8 @@ jobs:
           }
           .brand .site-brand-name-img{
             display:block !important;
-            position:static !important;
+            position:relative !important;
+            z-index:21 !important;
             width:360px !important;
             height:auto !important;
             max-width:360px !important;
@@ -77,23 +81,24 @@ jobs:
             padding:0 !important;
             flex:0 0 360px !important;
             object-fit:contain !important;
-            object-position:left center !important;
+            object-position:center center !important;
             opacity:1 !important;
             visibility:visible !important;
             filter:none !important;
             -webkit-filter:none !important;
             mix-blend-mode:normal !important;
             clip-path:none !important;
-            image-rendering:auto !important;
+            overflow:visible !important;
           }
           @media(max-width:1100px){
-            .brand{gap:24px !important}
+            .topbar{min-height:125px !important;height:125px !important}
+            .brand{gap:24px !important;height:125px !important}
             .brand > img:first-child{width:100px !important;max-width:100px !important;flex-basis:100px !important}
             .brand .site-brand-name-img{width:300px !important;max-width:300px !important;flex-basis:300px !important}
           }
           @media(max-width:700px){
-            .topbar{min-height:72px !important;height:72px !important}
-            .brand{gap:12px !important;height:72px !important}
+            .topbar{min-height:90px !important;height:90px !important}
+            .brand{gap:12px !important;height:90px !important}
             .brand > img:first-child{width:82px !important;height:60px !important;max-width:82px !important;max-height:60px !important;flex-basis:82px !important}
             .brand .site-brand-name-img{width:210px !important;max-width:210px !important;flex-basis:210px !important}
           }
@@ -116,5 +121,5 @@ jobs:
             echo "Building image, logo, company name graphic and cache version are already current."
             exit 0
           fi
-          git commit -m "Fix header logo and company name spacing"
+          git commit -m "Fix company name vertical clipping in header"
           git push
