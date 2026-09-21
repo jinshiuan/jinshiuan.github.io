@@ -28,40 +28,55 @@ jobs:
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # The supplied company-name artwork is intentionally kept intact.
-          # Use a larger, fixed header size and give the header enough height so
-          # the second line (AUTO PARTS LTD.) is not clipped or blurred by the
-          # site's existing global image/header rules.
+          # The supplied company-name artwork is kept unchanged.
+          # Position it explicitly beside the existing logo instead of letting
+          # the site's flex/image rules stretch, fade or clip its second line.
           brand_css = '''<style id="jinshiuan-brand-name-style">
-          header:has(.site-brand-name-img){min-height:92px !important;height:92px !important;overflow:visible !important;}
+          header:has(.site-brand-name-img){
+            position:relative !important;
+            min-height:92px !important;
+            height:92px !important;
+            overflow:visible !important;
+          }
           .site-brand-name-img{
+            position:absolute !important;
+            left:540px !important;
+            top:9px !important;
             display:block !important;
             width:390px !important;
-            height:72px !important;
-            max-width:390px !important;
-            max-height:72px !important;
-            min-width:390px !important;
-            min-height:72px !important;
-            object-fit:fill !important;
+            height:auto !important;
+            max-width:none !important;
+            max-height:none !important;
+            min-width:0 !important;
+            min-height:0 !important;
+            object-fit:contain !important;
             object-position:center center !important;
-            margin-left:14px !important;
-            margin-top:4px !important;
-            margin-bottom:0 !important;
-            flex:0 0 390px !important;
-            line-height:0 !important;
+            margin:0 !important;
+            padding:0 !important;
+            flex:none !important;
+            opacity:1 !important;
+            visibility:visible !important;
+            filter:none !important;
+            backdrop-filter:none !important;
+            -webkit-filter:none !important;
+            mask:none !important;
+            -webkit-mask:none !important;
+            mix-blend-mode:normal !important;
+            clip-path:none !important;
+            image-rendering:auto !important;
+            line-height:normal !important;
+            z-index:99999 !important;
+            isolation:isolate !important;
           }
           @media(max-width:700px){
-            header:has(.site-brand-name-img){min-height:72px !important;height:72px !important;}
+            header:has(.site-brand-name-img){
+              min-height:72px !important;
+              height:72px !important;
+            }
             .site-brand-name-img{
+              left:145px !important;
+              top:8px !important;
               width:250px !important;
-              height:48px !important;
-              max-width:250px !important;
-              max-height:48px !important;
-              min-width:250px !important;
-              min-height:48px !important;
-              flex-basis:250px !important;
-              margin-left:8px !important;
-              margin-top:2px !important;
             }
           }
           </style>'''
@@ -92,5 +107,5 @@ jobs:
             echo "Building image, logo, company name graphic and cache version are already current."
             exit 0
           fi
-          git commit -m "Make company name fully legible in header"
+          git commit -m "Fix company name header position and clarity"
           git push
