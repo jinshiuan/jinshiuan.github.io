@@ -150,6 +150,28 @@
 @media(max-width:1100px){.topbar{min-height:115px !important;height:115px !important}.js-header-wrap,.js-brand{height:115px !important}.js-header-logo{width:92px !important;height:92px !important;flex-basis:92px !important}.js-header-company strong{font-size:34px !important}.js-header-company span{font-size:15px !important;letter-spacing:3px !important}}
 @media(max-width:700px){.topbar{min-height:95px !important;height:95px !important}.js-header-wrap,.js-brand{height:95px !important}.js-header-logo{width:72px !important;height:72px !important;flex-basis:72px !important}.js-header-company strong{font-size:25px !important}.js-header-company span{font-size:11px !important;letter-spacing:2px !important}}
 </style>
+
+<!-- JINSHIUAN_HEADER_LOGO_ENLARGE -->
+<style>
+@media (min-width: 769px) {
+  body > header img, header img {
+    transform: scale(1.12) !important;
+    transform-origin: center center !important;
+  }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const candidates = Array.from(document.images).filter(function (img) {
+    const r = img.getBoundingClientRect();
+    return r.top >= -20 && r.top < 190 && r.width > 250;
+  });
+  candidates.forEach(function (img) {
+    img.style.setProperty('transform', 'scale(1.12)', 'important');
+    img.style.setProperty('transform-origin', 'center center', 'important');
+  });
+});
+</script>
 </head><body>
 <header class="topbar" id="top"><div class="wrap js-header-wrap"><a class="brand js-brand" href="#top" aria-label="JINSHIUAN AUTO PARTS LTD."><img class="js-header-logo" src="assets/jinshiuan-logo-new.webp?v=a71c277c78e29335a004939e8ae89d216f208664" alt="JINSHIUAN logo" loading="eager"><span class="js-header-company"><strong>JINSHIUAN</strong><span>AUTO PARTS LTD.</span></span></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
 <main><section class="hero"><div class="wrap hero-inner">
