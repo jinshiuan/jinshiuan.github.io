@@ -1,0 +1,38 @@
+name: One-time logo gloss
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply glossy J and S colors
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old1 = '.js-header-company strong .js-gold{color:#d9a441 !important}'
+          old2 = '.js-header-company strong .js-silver{color:#a8adb3 !important}'
+          new1 = '.js-header-company strong .js-gold{background:linear-gradient(180deg,#fff6b0 0%,#ffd44a 24%,#f2a900 52%,#ffe48a 76%,#b87800 100%) !important;background-clip:text !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;color:transparent !important}'
+          new2 = '.js-header-company strong .js-silver{background:linear-gradient(180deg,#ffffff 0%,#e9edf2 25%,#9da4ad 52%,#f7f9fb 76%,#7d858e 100%) !important;background-clip:text !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;color:transparent !important}'
+          if old1 in s:
+              s = s.replace(old1, new1, 1)
+          if old2 in s:
+              s = s.replace(old2, new2, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- index.html; then
+            echo "No changes needed"
+          else
+            git add index.html
+            git commit -m "Make J gold and S silver glossy"
+            git push
+          fi
