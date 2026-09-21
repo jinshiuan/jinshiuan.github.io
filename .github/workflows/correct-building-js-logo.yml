@@ -28,13 +28,34 @@ jobs:
           replacement = f'<img src="assets/jinshiuan-logo-header.webp?v={cache}"'
           s = re.sub(pattern, replacement, s, count=1)
 
-          # Put the uploaded JINSHIUAN AUTO PARTS LTD. graphic beside the existing logo.
+          # Display the uploaded company-name graphic at a controlled size.
+          # The previous rule allowed another global img rule to enlarge/crop it,
+          # which made the AUTO PARTS LTD. line blurry and partly hidden.
           brand_css = '''<style id="jinshiuan-brand-name-style">
-          .site-brand-name-img{display:inline-block;margin-left:14px;height:42px;width:auto;max-width:300px;object-fit:contain;vertical-align:middle}
-          @media(max-width:700px){.site-brand-name-img{height:30px;max-width:210px;margin-left:8px}}
+          .site-brand-name-img{
+            display:inline-block !important;
+            width:auto !important;
+            height:54px !important;
+            max-width:none !important;
+            max-height:54px !important;
+            object-fit:contain !important;
+            object-position:center center !important;
+            margin-left:14px !important;
+            vertical-align:middle !important;
+            flex:0 0 auto !important;
+          }
+          @media(max-width:700px){
+            .site-brand-name-img{
+              height:38px !important;
+              max-height:38px !important;
+              margin-left:8px !important;
+            }
+          }
           </style>'''
           if 'id="jinshiuan-brand-name-style"' not in s:
               s = re.sub(r'</head>', brand_css + '\n</head>', s, count=1, flags=re.I)
+          else:
+              s = re.sub(r'<style id="jinshiuan-brand-name-style">.*?</style>', brand_css.strip(), s, count=1, flags=re.S)
 
           img_tag = f'<img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v={cache}" alt="JINSHIUAN AUTO PARTS LTD." loading="eager">'
           old_img = '<span class="site-brand-name">JINSHIUAN AUTO PARTS LTD.</span>'
@@ -58,5 +79,5 @@ jobs:
             echo "Building image, logo, company name graphic and cache version are already current."
             exit 0
           fi
-          git commit -m "Use company name graphic beside website logo"
+          git commit -m "Fix company name display size and prevent clipping"
           git push
