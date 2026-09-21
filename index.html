@@ -140,52 +140,66 @@
 }
 </style>
 <style id="jinshiuan-brand-name-style">
-header:has(.site-brand-name-img){
-  position:relative !important;
-  min-height:92px !important;
-  height:92px !important;
+.topbar{
+  min-height:100px !important;
+  height:100px !important;
   overflow:visible !important;
 }
-.site-brand-name-img{
-  position:absolute !important;
-  left:540px !important;
-  top:9px !important;
+.brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:5cm !important;
+  height:100px !important;
+  flex:0 1 auto !important;
+  min-width:0 !important;
+  overflow:visible !important;
+}
+.brand > img:first-child{
   display:block !important;
-  width:390px !important;
+  width:110px !important;
+  height:78px !important;
+  max-width:110px !important;
+  max-height:78px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  flex:0 0 110px !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+.brand .site-brand-name-img{
+  display:block !important;
+  position:static !important;
+  width:360px !important;
   height:auto !important;
-  max-width:none !important;
+  max-width:360px !important;
   max-height:none !important;
   margin:0 !important;
   padding:0 !important;
-  flex:none !important;
+  flex:0 0 360px !important;
+  object-fit:contain !important;
+  object-position:left center !important;
   opacity:1 !important;
   visibility:visible !important;
   filter:none !important;
-  backdrop-filter:none !important;
   -webkit-filter:none !important;
-  mask:none !important;
-  -webkit-mask:none !important;
   mix-blend-mode:normal !important;
   clip-path:none !important;
-  object-fit:contain !important;
   image-rendering:auto !important;
-  z-index:99999 !important;
-  isolation:isolate !important;
+}
+@media(max-width:1100px){
+  .brand{gap:24px !important}
+  .brand > img:first-child{width:100px !important;max-width:100px !important;flex-basis:100px !important}
+  .brand .site-brand-name-img{width:300px !important;max-width:300px !important;flex-basis:300px !important}
 }
 @media(max-width:700px){
-  header:has(.site-brand-name-img){
-    min-height:72px !important;
-    height:72px !important;
-  }
-  .site-brand-name-img{
-    left:145px !important;
-    top:8px !important;
-    width:250px !important;
-  }
+  .topbar{min-height:72px !important;height:72px !important}
+  .brand{gap:12px !important;height:72px !important}
+  .brand > img:first-child{width:82px !important;height:60px !important;max-width:82px !important;max-height:60px !important;flex-basis:82px !important}
+  .brand .site-brand-name-img{width:210px !important;max-width:210px !important;flex-basis:210px !important}
 }
 </style>
 </head><body>
-<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-logo-header.webp?v=4057004e6e1ead7bf316761fca3c79e9abe80460" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v=4057004e6e1ead7bf316761fca3c79e9abe80460" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
+<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-logo-header.webp?v=70a02c83f39532aff079380de11cf1b6d6f9b76d" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v=70a02c83f39532aff079380de11cf1b6d6f9b76d" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
 <main><section class="hero"><div class="wrap hero-inner">
 <div class="hero-product"><div class="hero-static"><img src="assets/jinshiuan-building-new(1).png?v=2026092101" alt="JINSHIUAN Factory Building" loading="eager"></div></div>
 <div class="hero-copy"><div class="kicker">JINSHIUAN</div><h1>AUTO<br>PARTS</h1><p>Parts Development · Sourcing · Export</p><a class="btn" href="#products">VIEW PRODUCTS</a></div>
