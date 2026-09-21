@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Restore clean JINSHIUAN header from the new assets
+      - name: Restore clean JINSHIUAN header from the new single image
         run: |
           python - <<'PY'
           import os, re
@@ -31,21 +31,20 @@ jobs:
               s = re.sub(r'<style id="' + re.escape(sid) + r'">.*?</style>\s*', '', s, flags=re.S)
           s = re.sub(r'<script id="jinshiuan-company-name-script">.*?</script>\s*', '', s, flags=re.S)
 
-          # Use the current clean image assets only. The company-name image already
-          # contains both JINSHIUAN and AUTO PARTS LTD., so no extra text layer is used.
-          header = '''<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img class="brand-js-logo" src="assets/jinshiuan-logo-header.webp?v=__CACHE__" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="brand-company-image" src="assets/jinshiuan-company-name.webp?v=__CACHE__" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>'''.replace('__CACHE__', cache)
+          # Use ONE complete header image. It already contains the JS mark,
+          # JINSHIUAN and AUTO PARTS LTD. No separate logo or text layer.
+          header = '''<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img class="site-header-full-brand" src="assets/jinshiuan-company-name.webp?v=__CACHE__" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>'''.replace('__CACHE__', cache)
           s, n = re.subn(r'<header class="topbar" id="top">.*?</header>', header, s, count=1, flags=re.S)
           if n != 1:
               raise SystemExit(f'Expected exactly one topbar header, replaced {n}')
 
           css = '''<style id="jinshiuan-header-brand-style">
-          .topbar{min-height:120px !important;height:120px !important;overflow:visible !important;position:relative !important}
-          .topbar .brand{display:flex !important;align-items:center !important;gap:18px !important;height:120px !important;flex:0 1 auto !important;min-width:0 !important;overflow:visible !important;position:relative !important;z-index:20 !important;line-height:0 !important}
-          .topbar .brand-js-logo{display:block !important;width:118px !important;height:82px !important;max-width:118px !important;max-height:82px !important;object-fit:contain !important;object-position:center center !important;flex:0 0 118px !important;opacity:1 !important;visibility:visible !important;filter:none !important;-webkit-filter:none !important;box-shadow:none !important}
-          .topbar .brand-company-image{display:block !important;width:420px !important;height:auto !important;max-width:420px !important;max-height:none !important;object-fit:contain !important;object-position:center center !important;flex:0 0 420px !important;opacity:1 !important;visibility:visible !important;filter:none !important;-webkit-filter:none !important;box-shadow:none !important}
-          .topbar .brand-company-image:hover,.topbar .brand-js-logo:hover{opacity:1 !important}
-          @media(max-width:1100px){.topbar{min-height:105px !important;height:105px !important}.topbar .brand{gap:14px !important;height:105px !important}.topbar .brand-js-logo{width:100px !important;height:70px !important;max-width:100px !important;max-height:70px !important;flex-basis:100px !important}.topbar .brand-company-image{width:350px !important;max-width:350px !important;flex-basis:350px !important}}
-          @media(max-width:700px){.topbar{min-height:88px !important;height:88px !important}.topbar .brand{gap:10px !important;height:88px !important}.topbar .brand-js-logo{width:78px !important;height:56px !important;max-width:78px !important;max-height:56px !important;flex-basis:78px !important}.topbar .brand-company-image{width:245px !important;max-width:245px !important;flex-basis:245px !important}.nav{gap:10px !important}}
+          .topbar{min-height:135px !important;height:135px !important;overflow:visible !important;position:relative !important}
+          .topbar .brand{display:flex !important;align-items:center !important;height:135px !important;flex:0 0 auto !important;min-width:0 !important;overflow:visible !important;position:relative !important;z-index:20 !important;line-height:0 !important}
+          .topbar .site-header-full-brand{display:block !important;width:650px !important;height:auto !important;max-width:650px !important;max-height:none !important;object-fit:contain !important;object-position:left center !important;flex:0 0 650px !important;opacity:1 !important;visibility:visible !important;filter:none !important;-webkit-filter:none !important;box-shadow:none !important}
+          .topbar .site-header-full-brand:hover{opacity:1 !important}
+          @media(max-width:1100px){.topbar{min-height:120px !important;height:120px !important}.topbar .brand{height:120px !important}.topbar .site-header-full-brand{width:560px !important;max-width:560px !important;flex-basis:560px !important}}
+          @media(max-width:700px){.topbar{min-height:95px !important;height:95px !important}.topbar .brand{height:95px !important}.topbar .site-header-full-brand{width:390px !important;max-width:390px !important;flex-basis:390px !important}.nav{gap:10px !important}}
           </style>'''
           s = re.sub(r'</head>', css + '\n</head>', s, count=1, flags=re.I)
           p.write_text(s, encoding='utf-8')
@@ -59,6 +58,6 @@ jobs:
             echo "No changes needed."
             exit 0
           fi
-          git commit -m "Fix JINSHIUAN header image layout"
+          git commit -m "Use single clean JINSHIUAN header image"
           git pull --rebase origin main
           git push
