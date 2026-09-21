@@ -155,10 +155,6 @@ header:has(.site-brand-name-img){
   height:auto !important;
   max-width:none !important;
   max-height:none !important;
-  min-width:0 !important;
-  min-height:0 !important;
-  object-fit:contain !important;
-  object-position:center center !important;
   margin:0 !important;
   padding:0 !important;
   flex:none !important;
@@ -171,8 +167,8 @@ header:has(.site-brand-name-img){
   -webkit-mask:none !important;
   mix-blend-mode:normal !important;
   clip-path:none !important;
+  object-fit:contain !important;
   image-rendering:auto !important;
-  line-height:normal !important;
   z-index:99999 !important;
   isolation:isolate !important;
 }
@@ -188,23 +184,8 @@ header:has(.site-brand-name-img){
   }
 }
 </style>
-<style id="jinshiuan-company-name-fix">
-.site-header-company-name{display:inline-flex!important;align-items:center!important;margin-left:14px!important;height:52px!important;max-width:360px!important;width:auto!important;vertical-align:middle!important;}
-.site-header-company-name img{display:block!important;height:52px!important;width:auto!important;max-width:360px!important;object-fit:contain!important;}
-@media(max-width:700px){.site-header-company-name{height:34px!important;max-width:230px!important;margin-left:8px!important}.site-header-company-name img{height:34px!important;max-width:230px!important}}
-</style>
-<script id="jinshiuan-company-name-script">
-document.addEventListener('DOMContentLoaded',function(){
-  const src='assets/jinshiuan-company-name.webp?v='+Date.now();
-  const els=[...document.querySelectorAll('header *, nav *, body *')];
-  const target=els.find(e=>e.children.length===0 && e.textContent.trim()==='JINSHIUAN AUTO PARTS LTD.');
-  if(target){target.outerHTML='<span class="site-header-company-name"><img src="'+src+'" alt="JINSHIUAN AUTO PARTS LTD."></span>';return;}
-  const logo=[...document.images].find(i=>/jinshiuan|logo/i.test(i.alt+' '+i.src));
-  if(logo && logo.parentElement && !document.querySelector('.site-header-company-name')){logo.insertAdjacentHTML('afterend','<span class="site-header-company-name"><img src="'+src+'" alt="JINSHIUAN AUTO PARTS LTD."></span>');}
-});
-</script>
 </head><body>
-<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-logo-header.webp?v=2a27ac381707770c5ee96e5e0e845b0488cfebeb" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v=2a27ac381707770c5ee96e5e0e845b0488cfebeb" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
+<header class="topbar" id="top"><div class="wrap" style="display:flex;width:100%;align-items:center;justify-content:space-between"><a class="brand" href="#top" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-logo-header.webp?v=4057004e6e1ead7bf316761fca3c79e9abe80460" alt="JINSHIUAN AUTO PARTS" loading="eager"><img class="site-brand-name-img" src="assets/jinshiuan-company-name.webp?v=4057004e6e1ead7bf316761fca3c79e9abe80460" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
 <main><section class="hero"><div class="wrap hero-inner">
 <div class="hero-product"><div class="hero-static"><img src="assets/jinshiuan-building-new(1).png?v=2026092101" alt="JINSHIUAN Factory Building" loading="eager"></div></div>
 <div class="hero-copy"><div class="kicker">JINSHIUAN</div><h1>AUTO<br>PARTS</h1><p>Parts Development · Sourcing · Export</p><a class="btn" href="#products">VIEW PRODUCTS</a></div>
