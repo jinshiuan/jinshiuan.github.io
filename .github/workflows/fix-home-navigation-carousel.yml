@@ -1,0 +1,39 @@
+name: Fix homepage navigation and carousel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, '[homepage-fix]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch homepage safely
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          css_marker = '/* HOMEPAGE INTERACTION FIX */'
+          js_marker = '// HOMEPAGE INTERACTION FIX'
+          css = '''\n/* HOMEPAGE INTERACTION FIX */\n.topbar,.topbar *,.nav,.nav *{pointer-events:auto!important}\n.topbar{z-index:1000!important;position:sticky!important}\n.nav{position:relative!important;z-index:1001!important}\n.nav a{position:relative!important;z-index:1002!important;pointer-events:auto!important}\n.home-carousel{display:block!important;visibility:visible!important;position:relative!important;z-index:3!important}\n.home-carousel-viewport{display:block!important;visibility:visible!important}\n.home-carousel-slide{pointer-events:none}\n.home-carousel-slide.active{pointer-events:auto}\n''' 
+          if css_marker not in s:
+              s = s.replace('</style>', css + '</style>', 1)
+          js = '''\n<script>\n// HOMEPAGE INTERACTION FIX\n(function(){\n  function init(){\n    document.querySelectorAll('.nav a').forEach(function(a){\n      a.style.pointerEvents='auto';\n      a.style.position='relative';\n      a.style.zIndex='1002';\n    });\n    var slides=[].slice.call(document.querySelectorAll('.home-carousel-slide'));\n    if(slides.length){\n      var i=slides.findIndex(function(x){return x.classList.contains('active')});\n      if(i<0){i=0;slides[0].classList.add('active');}\n      window.setInterval(function(){\n        slides[i].classList.remove('active');\n        i=(i+1)%slides.length;\n        slides[i].classList.add('active');\n        document.querySelectorAll('.home-carousel-dot').forEach(function(d,n){d.classList.toggle('active',n===i);});\n      },5000);\n    }\n  }\n  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();\n})();\n</script>\n'''
+          if js_marker not in s:
+              s = s.replace('</body>', js + '</body>', 1)
+          p.write_text(s, encoding='utf-8')
+      - name: Commit homepage fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Fix homepage navigation and carousel [homepage-fix]'
+          git push
