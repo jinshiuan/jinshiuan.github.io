@@ -160,18 +160,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
-<style>
-/* JINSHIUAN_CLEAN_HOME_HERO */
-.hero{background:#fff!important;padding:0!important;margin:0!important;}
-.hero .hero-inner{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;gap:0!important;align-items:stretch!important;}
-.hero .hero-inner::before{content:"";display:block;width:100%;height:clamp(420px,38vw,620px);background:url("assets/jinshiuan-home-hero.webp") center center/cover no-repeat;order:0;flex:0 0 auto;}
-.hero .hero-inner>.hero-product,.hero .hero-inner>.hero-copy{display:none!important;}
-.hero .hero-inner>:nth-child(3){order:1!important;width:100%!important;max-width:none!important;margin:0!important;padding:28px 24px 34px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;background:#fff!important;}
-@media(max-width:700px){
-  .hero .hero-inner::before{height:58vw;min-height:240px;max-height:420px;background-position:center center;}
-  .hero .hero-inner>:nth-child(3){padding:22px 12px 28px!important;}
-}
-</style>
 <style id="jinshiuan-header-brand-style">
 .topbar{min-height:135px !important;height:135px !important;overflow:visible !important;position:relative !important}
 .js-header-wrap{display:flex !important;width:100% !important;align-items:center !important;justify-content:space-between !important;height:135px !important}
@@ -186,8 +174,27 @@ document.addEventListener('DOMContentLoaded', function () {
 @media(max-width:1100px){.topbar{min-height:120px !important;height:120px !important}.js-header-wrap,.js-brand{height:120px !important}.js-header-logo{width:100px !important;height:100px !important;flex-basis:100px !important}.js-header-company strong{font-size:38px !important}.js-header-company span{font-size:16px !important;letter-spacing:3px !important}}
 @media(max-width:700px){.topbar{min-height:95px !important;height:95px !important}.js-header-wrap,.js-brand{height:95px !important}.js-header-logo{width:72px !important;height:72px !important;flex-basis:72px !important}.js-header-company strong{font-size:25px !important}.js-header-company span{font-size:11px !important;letter-spacing:2px !important;transform:translateX(5px) !important}}
 </style>
+<style>
+/* JINSHIUAN_CLEAN_HOME_HERO */
+.hero{background:#fff!important;padding:0!important;margin:0!important;}
+.hero .hero-inner{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;gap:0!important;align-items:stretch!important;}
+.hero .hero-inner::before{content:"";display:block;width:100%;height:clamp(420px,38vw,620px);background:url("assets/jinshiuan-home-hero.webp") center center/cover no-repeat;order:0;flex:0 0 auto;}
+.hero .hero-inner>.hero-product,.hero .hero-inner>.hero-copy{display:none!important;}
+.hero .hero-inner>:nth-child(3){order:1!important;width:100%!important;max-width:none!important;margin:0!important;padding:28px 24px 34px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;background:#fff!important;}
+@media(max-width:700px){
+  .hero .hero-inner::before{height:58vw;min-height:240px;max-height:420px;background-position:center center;}
+  .hero .hero-inner>:nth-child(3){padding:22px 12px 28px!important;}
+}
+</style>
+<style id="jinshiuan-final-home-fix">
+header:not(.topbar){display:none !important;}
+body > nav:not(.nav){display:none !important;}
+.topbar{overflow:visible !important;position:relative !important;z-index:1000 !important;}
+.topbar .brand{overflow:visible !important;}
+.js-header-logo{object-fit:contain !important;object-position:center !important;max-width:none !important;max-height:none !important;}
+</style>
 </head><body>
-<header class="topbar" id="top"><div class="wrap js-header-wrap"><a class="brand js-brand" href="#top" aria-label="JINSHIUAN AUTO PARTS LTD."><img class="js-header-logo" src="assets/jinshiuan-logo-new.webp?v=0affe0b44261a3ebf839c661cc4f1eb331716c0c" alt="JINSHIUAN logo" loading="eager"><span class="js-header-company"><strong><b class="js-gold">J</b>IN<b class="js-silver">S</b>HIUAN</strong><span>AUTO PARTS LTD.</span></span></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
+<header class="topbar" id="top"><div class="wrap js-header-wrap"><a class="brand js-brand" href="#top" aria-label="JINSHIUAN AUTO PARTS LTD."><img class="js-header-logo" src="assets/jinshiuan-logo-new.webp?v=8864861757cea891c00656d86c0e754c21a55fb4" alt="JINSHIUAN logo" loading="eager"><span class="js-header-company"><strong><b class="js-gold">J</b>IN<b class="js-silver">S</b>HIUAN</strong><span>AUTO PARTS LTD.</span></span></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
 <main><section class="hero"><div class="wrap hero-inner">
 <div class="hero-product"><div class="hero-static"><img src="assets/jinshiuan-building-new(1).png?v=2026092101" alt="JINSHIUAN Factory Building" loading="eager"></div></div>
 <div class="hero-copy"><div class="kicker">JINSHIUAN</div><h1>AUTO<br>PARTS</h1><p>Parts Development · Sourcing · Export</p><a class="btn" href="#products">VIEW PRODUCTS</a></div>
