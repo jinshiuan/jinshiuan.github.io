@@ -1,0 +1,64 @@
+name: Repair JINSHIUAN homepage
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore carousel-based homepage and make navigation clickable
+        shell: bash
+        run: |
+          set -e
+          BASE=50cde7ce2721688217b7cb2251709cfb15d62403
+          git checkout "$BASE" -- index.html
+
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove the temporary single-image homepage override only.
+          s, n = re.subn(
+              r'<style>\s*/\* JINSHIUAN_CLEAN_HOME_HERO \*/.*?</style>\s*',
+              '', s, count=1, flags=re.S
+          )
+          if n != 1:
+              raise SystemExit(f'Expected one temporary clean-home-hero style, found {n}')
+
+          # Keep the existing header/logo exactly as restored, but guarantee that
+          # nothing from the hero can sit above the navigation and block clicks.
+          fix = '''<style id="jinshiuan-navigation-final-fix">
+          .topbar{position:relative!important;z-index:1000!important;pointer-events:auto!important;}
+          .topbar .wrap,.topbar .nav,.topbar .nav a,.topbar .brand{position:relative!important;z-index:1001!important;pointer-events:auto!important;}
+          .topbar .nav a{cursor:pointer!important;}
+          .hero,.hero-inner,.hero-product,.hero-copy{position:relative;z-index:1;}
+          </style>'''
+          s = re.sub(r'</head>', fix + '\n</head>', s, count=1, flags=re.I)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Restore homepage carousel and clickable navigation"
+          git push
+
+          rm -f .github/workflows/final-homepage-repair.yml
+          git add .github/workflows/final-homepage-repair.yml
+          git commit -m "Remove temporary homepage repair workflow"
+          git push
