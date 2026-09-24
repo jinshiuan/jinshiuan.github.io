@@ -1,69 +1,13 @@
-name: Stabilize JINSHIUAN homepage now
+name: Stabilize JINSHIUAN homepage
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  stabilize:
-    if: github.actor != 'github-actions[bot]'
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Restore the known carousel homepage and remove conflicting repair workflows
-        shell: bash
-        run: |
-          set -e
-          BASE=50cde7ce2721688217b7cb2251709cfb15d62403
-          git checkout "$BASE" -- index.html
-
-          python3 <<'PY'
-          from pathlib import Path
-          import re
-
-          p = Path('index.html')
-          s = p.read_text(encoding='utf-8')
-
-          # Remove the temporary single-image homepage override from the base version.
-          s, n = re.subn(
-              r'<style>\s*/\* JINSHIUAN_CLEAN_HOME_HERO \*/.*?</style>\s*',
-              '', s, count=1, flags=re.S
-          )
-          if n != 1:
-              raise SystemExit(f'Expected one clean-home override, found {n}')
-
-          # Keep the restored carousel DOM. Only ensure the header is above the hero
-          # and receives mouse clicks.
-          css = '''<style id="jinshiuan-navigation-stable">
-          .topbar{position:relative!important;z-index:1000!important;pointer-events:auto!important;}
-          .topbar .wrap,.topbar .brand,.topbar .nav,.topbar .nav a{position:relative!important;z-index:1001!important;pointer-events:auto!important;}
-          .topbar .nav a{cursor:pointer!important;}
-          .hero{position:relative!important;z-index:1!important;}
-          .hero *{pointer-events:auto;}
-          </style>'''
-          s = re.sub(r'</head>', css + '\n</head>', s, count=1, flags=re.I)
-          p.write_text(s, encoding='utf-8')
-          PY
-
-          # Remove the repair workflows that have been repeatedly rewriting the homepage.
-          rm -f \
-            .github/workflows/apply-home-hero.yml \
-            .github/workflows/correct-building-js-logo.yml \
-            .github/workflows/enlarge-header-logo.yml \
-            .github/workflows/final-homepage-fix.yml \
-            .github/workflows/final-homepage-repair.yml \
-            .github/workflows/repair-home-carousel.yml \
-            .github/workflows/stabilize-homepage-now.yml
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html .github/workflows
-          git commit -m "Stabilize homepage carousel and navigation"
-          git push
+      - run: echo "Homepage is stabilized; no automatic repair is required."
