@@ -1,0 +1,64 @@
+name: Final JINSHIUAN homepage fix
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.head_commit.message != 'Finalize homepage hero header and carousel'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fix homepage header, hero image path and carousel visibility
+        shell: bash
+        run: |
+          set -e
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          marker = 'JINSHIUAN_FINAL_HOME_FIX_20260924'
+          if marker in text:
+              raise SystemExit(0)
+
+          css = r'''<style id="JINSHIUAN_FINAL_HOME_FIX_20260924">
+          /* JINSHIUAN_FINAL_HOME_FIX_20260924 */
+          header:not(.topbar){display:none!important;}
+          body > nav:not(.nav){display:none!important;}
+          .topbar{position:sticky!important;top:0!important;z-index:10000!important;overflow:visible!important;pointer-events:auto!important;}
+          .topbar .brand,.topbar .nav,.topbar .nav a{pointer-events:auto!important;position:relative!important;z-index:10001!important;}
+          .hero{position:relative!important;z-index:1!important;}
+          .hero .hero-inner{position:relative!important;z-index:1!important;}
+          .hero .hero-inner::before{background-image:url("assets/jinshiuan-home-hero.webp.png")!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;pointer-events:none!important;}
+          .hero .hero-inner>.hero-product,.hero .hero-inner>.hero-copy{display:none!important;}
+          .hero .hero-inner>.hero-carousel{display:flex!important;order:1!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;max-width:none!important;margin:0!important;padding:28px 24px 34px!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;}
+          .hero .hero-inner>.hero-carousel .home-carousel-wrap{width:100%!important;max-width:1100px!important;margin:0 auto!important;}
+          .hero .hero-inner>.hero-carousel .home-carousel-viewport{width:100%!important;height:430px!important;}
+          @media(max-width:700px){
+            .hero .hero-inner>.hero-carousel{padding:22px 12px 28px!important;}
+            .hero .hero-inner>.hero-carousel .home-carousel-viewport{height:300px!important;}
+          }
+          </style>'''
+
+          text = re.sub(r'</head>', css + '\n</head>', text, count=1, flags=re.I)
+          p.write_text(text, encoding='utf-8')
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Finalize homepage hero header and carousel"
+          git push
+
+          rm -f .github/workflows/final-homepage-fix.yml
+          git add .github/workflows/final-homepage-fix.yml
+          git commit -m "Remove temporary homepage fix workflow"
+          git push
