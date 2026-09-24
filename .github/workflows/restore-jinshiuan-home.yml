@@ -1,0 +1,88 @@
+name: Restore JINSHIUAN homepage
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore known-good homepage and apply final layout
+        shell: bash
+        run: |
+          set -e
+          BASE=ad5aa6ba31e57f308e86b50ea15334cdabcc9327
+          git checkout "$BASE" -- index.html
+
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove previously injected header/hero repair blocks so they cannot stack.
+          for sid in [
+              'jinshiuan-header-brand-style',
+              'jinshiuan-company-name-fix',
+              'jinshiuan-brand-name-style',
+              'jinshiuan-header-fix',
+              'jinshiuan-clean-home-hero',
+              'jinshiuan-final-home-layout'
+          ]:
+              s = re.sub(r'<style id="' + re.escape(sid) + r'">.*?</style>\s*', '', s, flags=re.S)
+
+          # Remove any old one-off header script.
+          s = re.sub(r'<script id="jinshiuan-company-name-script">.*?</script>\s*', '', s, flags=re.S)
+
+          # Clean, stable header. The logo is the approved JINSHIUAN logo asset and is
+          # displayed as a complete image so no part of it can be clipped.
+          header = '''<header class="topbar" id="top"><div class="wrap js-header-wrap"><a class="brand js-brand" href="#top" aria-label="JINSHIUAN AUTO PARTS LTD."><img class="js-header-logo" src="assets/jinshiuan-logo-new.webp" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>'''
+          s, n = re.subn(r'<header class="topbar" id="top">.*?</header>', header, s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'Expected one topbar header, replaced {n}')
+
+          # Replace only the old homepage hero. Products and all following sections remain intact.
+          hero = '''<section class="hero" id="home"><img class="js-fixed-home-hero" src="assets/jinshiuan-home-hero.webp.png" alt="JINSHIUAN AUTO PARTS LTD. homepage" loading="eager"></section>'''
+          s, n = re.subn(r'<section class="hero"[^>]*>.*?</section>', hero, s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'Expected one hero section, replaced {n}')
+
+          css = '''<style id="jinshiuan-final-home-layout">
+          .topbar{height:118px!important;min-height:118px!important;overflow:visible!important;position:sticky!important;top:0!important;z-index:20!important;background:rgba(255,255,255,.97)!important}
+          .js-header-wrap{height:118px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important}
+          .js-brand{height:118px!important;display:flex!important;align-items:center!important;flex:0 0 auto!important;overflow:visible!important;line-height:1!important;text-decoration:none!important}
+          .js-header-logo{display:block!important;width:390px!important;height:100px!important;max-width:390px!important;max-height:100px!important;object-fit:contain!important;object-position:left center!important;opacity:1!important;visibility:visible!important;filter:none!important;transform:none!important}
+          .js-header-wrap .nav{display:flex!important;align-items:center!important;gap:22px!important;white-space:nowrap!important}
+          .js-header-wrap .nav a{display:block!important;color:#4b5563!important;text-decoration:none!important;font-size:14px!important}
+          .js-header-wrap .nav a:hover{color:#111!important}
+          .hero.js-none,.hero{min-height:0!important;height:auto!important;padding:0!important;margin:0!important;background:#fff!important;overflow:hidden!important;position:relative!important}
+          .js-fixed-home-hero{display:block!important;width:100%!important;height:auto!important;max-width:none!important;margin:0!important;padding:0!important;object-fit:contain!important;object-position:center center!important}
+          @media(max-width:900px){.topbar{height:100px!important;min-height:100px!important}.js-header-wrap,.js-brand{height:100px!important}.js-header-logo{width:320px!important;height:82px!important;max-width:320px!important;max-height:82px!important}.js-header-wrap .nav{gap:14px!important}.js-header-wrap .nav a{font-size:13px!important}.js-fixed-home-hero{width:100%!important;height:auto!important}}
+          @media(max-width:700px){.topbar{height:82px!important;min-height:82px!important}.js-header-wrap,.js-brand{height:82px!important}.js-header-logo{width:250px!important;height:68px!important;max-width:250px!important;max-height:68px!important}.js-header-wrap .nav a{display:none!important}.js-fixed-home-hero{width:100%!important;height:auto!important}}
+          </style>'''
+          s = re.sub(r'</head>', css + '\n</head>', s, count=1, flags=re.I)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Restore stable JINSHIUAN homepage"
+          git push
+
+          rm -f .github/workflows/restore-jinshiuan-home.yml
+          git add .github/workflows/restore-jinshiuan-home.yml
+          git commit -m "Remove temporary homepage restore workflow"
+          git push
