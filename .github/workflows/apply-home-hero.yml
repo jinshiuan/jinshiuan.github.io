@@ -19,6 +19,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          git fetch origin ad5aa6ba31e57f308e86b50ea15334cdabcc9327 --depth=1
           git checkout ad5aa6ba31e57f308e86b50ea15334cdabcc9327 -- index.html
 
           python3 <<'PY'
