@@ -1,4 +1,4 @@
-name: Apply JINSHIUAN Homepage Hero
+name: Restore JINSHIUAN Homepage Clean Hero
 
 on:
   push:
@@ -9,126 +9,55 @@ permissions:
 
 jobs:
   apply:
+    if: github.event.head_commit.message != 'Apply clean homepage hero and move Products below'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Apply hero image and homepage layout
+      - name: Restore clean base and apply one-time layout
         shell: bash
         run: |
-          if [ ! -f "assets/jinshiuan-home-hero.webp" ]; then
-            echo "Hero image not uploaded yet; nothing to do."
-            exit 0
-          fi
+          set -e
+          git checkout ad5aa6ba31e57f308e86b50ea15334cdabcc9327 -- index.html
 
           python3 <<'PY'
           from pathlib import Path
           import re
 
-          index = Path('index.html')
-          text = index.read_text(encoding='utf-8')
-          marker = '/* JINSHIUAN_HOME_HERO_V1 */'
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          marker = '/* JINSHIUAN_CLEAN_HOME_HERO */'
           if marker in text:
-              print('Homepage patch already present; nothing to do.')
               raise SystemExit(0)
 
-          backup = Path('JINSHIUAN_AUTO_PARTS_INDEX_BEFORE_HOME_HERO.html')
-          if not backup.exists():
-              backup.write_text(text, encoding='utf-8')
+          css = '''<style>
+          /* JINSHIUAN_CLEAN_HOME_HERO */
+          .hero{background:#fff!important;padding:0!important;margin:0!important;}
+          .hero .hero-inner{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;gap:0!important;align-items:stretch!important;}
+          .hero .hero-inner::before{content:"";display:block;width:100%;height:clamp(420px,38vw,620px);background:url("assets/jinshiuan-home-hero.webp") center center/cover no-repeat;order:0;flex:0 0 auto;}
+          .hero .hero-inner>.hero-product,.hero .hero-inner>.hero-copy{display:none!important;}
+          .hero .hero-inner>:nth-child(3){order:1!important;width:100%!important;max-width:none!important;margin:0!important;padding:28px 24px 34px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;background:#fff!important;}
+          @media(max-width:700px){
+            .hero .hero-inner::before{height:58vw;min-height:240px;max-height:420px;background-position:center center;}
+            .hero .hero-inner>:nth-child(3){padding:22px 12px 28px!important;}
+          }
+          </style>'''
 
-          js = r'''<script>
-          /* JINSHIUAN_HOME_HERO_V1 */
-          (function(){
-            'use strict';
-            function applyJinshiuanHero(){
-              if(document.getElementById('jinshiuan-home-hero')) return;
-
-              var headings = Array.prototype.slice.call(document.querySelectorAll('h1,h2,h3,h4,h5,h6'));
-              var prodHeading = headings.find(function(h){
-                return /^Products$/i.test((h.textContent||'').trim()) && !h.closest('header,nav');
-              });
-
-              var productSection = null;
-              if(prodHeading){
-                productSection = prodHeading.closest('section');
-                if(!productSection){
-                  var p = prodHeading;
-                  for(var i=0;i<6 && p;i++,p=p.parentElement){
-                    var r=p.getBoundingClientRect();
-                    if(r.height>180 && r.width>500){ productSection=p; break; }
-                  }
-                }
-              }
-
-              var productTop = productSection ? productSection.getBoundingClientRect().top : Infinity;
-              var candidates = Array.prototype.slice.call(document.querySelectorAll('section'));
-              var hero = candidates.find(function(el){
-                if(el===productSection || el.contains(productSection)) return false;
-                var r=el.getBoundingClientRect();
-                var imgs=el.querySelectorAll('img').length;
-                return imgs>0 && r.width>700 && r.height>250 && r.top>=0 && r.top<productTop;
-              });
-
-              if(!hero){
-                var bodyChildren=Array.prototype.slice.call(document.body.children);
-                hero=bodyChildren.find(function(el){
-                  if(el.tagName==='HEADER' || el.tagName==='NAV' || el===productSection) return false;
-                  var r=el.getBoundingClientRect();
-                  return el.querySelector('img') && r.width>700 && r.height>250 && r.top>=0;
-                });
-              }
-
-              var main=document.querySelector('main') || document.body;
-              var mount=hero || productSection || main.firstElementChild;
-              if(!mount) return;
-
-              var newHero=document.createElement('div');
-              newHero.id='jinshiuan-home-hero';
-              newHero.style.cssText='width:100%;margin:0;padding:0;line-height:0;background:#fff;position:relative;z-index:1;';
-              var img=document.createElement('img');
-              img.src='assets/jinshiuan-home-hero.webp';
-              img.alt='JINSHIUAN AUTO PARTS LTD.';
-              img.style.cssText='display:block;width:100%;height:auto;max-width:none;margin:0;padding:0;object-fit:cover;';
-              newHero.appendChild(img);
-
-              if(hero){
-                hero.parentNode.insertBefore(newHero,hero);
-                hero.style.display='none';
-              }else{
-                mount.parentNode.insertBefore(newHero,mount);
-              }
-
-              if(productSection){
-                productSection.style.marginTop='0';
-                productSection.style.position='relative';
-                if(newHero.parentNode===productSection.parentNode){
-                  newHero.parentNode.insertBefore(productSection,newHero.nextSibling);
-                }else{
-                  var target=hero && hero.parentNode ? hero.parentNode : main;
-                  target.appendChild(productSection);
-                }
-              }
-
-              document.documentElement.setAttribute('data-jinshiuan-home-hero','1');
-            }
-
-            if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(applyJinshiuanHero,900);});
-            else setTimeout(applyJinshiuanHero,900);
-            window.addEventListener('load',function(){setTimeout(applyJinshiuanHero,300);});
-          })();
-          </script>'''
-
-          if re.search(r'</body>', text, flags=re.I):
-              text = re.sub(r'</body>', js + '\n</body>', text, count=1, flags=re.I)
+          if re.search(r'</head>', text, flags=re.I):
+              text = re.sub(r'</head>', css + '\n</head>', text, count=1, flags=re.I)
           else:
-              text += '\n' + js + '\n'
-          index.write_text(text, encoding='utf-8')
-          print('Homepage patch applied.')
+              text = css + '\n' + text
+          p.write_text(text, encoding='utf-8')
           PY
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html JINSHIUAN_AUTO_PARTS_INDEX_BEFORE_HOME_HERO.html assets/jinshiuan-home-hero.webp
-          git diff --cached --quiet || git commit -m "Update homepage hero and move Products below"
+          git add index.html
+          git commit -m "Apply clean homepage hero and move Products below"
+          git push
+
+          rm -f .github/workflows/apply-home-hero.yml
+          git add .github/workflows/apply-home-hero.yml
+          git commit -m "Remove one-time homepage repair workflow"
           git push
