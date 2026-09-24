@@ -173,6 +173,24 @@ document.addEventListener('DOMContentLoaded', function () {
 @media(max-width:900px){.topbar{height:100px!important;min-height:100px!important}.js-header-wrap,.js-brand{height:100px!important}.js-header-logo{width:320px!important;height:82px!important;max-width:320px!important;max-height:82px!important}.js-header-wrap .nav{gap:14px!important}.js-header-wrap .nav a{font-size:13px!important}.js-fixed-home-hero{width:100%!important;height:auto!important}}
 @media(max-width:700px){.topbar{height:82px!important;min-height:82px!important}.js-header-wrap,.js-brand{height:82px!important}.js-header-logo{width:250px!important;height:68px!important;max-width:250px!important;max-height:68px!important}.js-header-wrap .nav a{display:none!important}.js-fixed-home-hero{width:100%!important;height:auto!important}}
 </style>
+<style id="JINSHIUAN_FINAL_HOME_FIX_20260924">
+/* JINSHIUAN_FINAL_HOME_FIX_20260924 */
+header:not(.topbar){display:none!important;}
+body > nav:not(.nav){display:none!important;}
+.topbar{position:sticky!important;top:0!important;z-index:10000!important;overflow:visible!important;pointer-events:auto!important;}
+.topbar .brand,.topbar .nav,.topbar .nav a{pointer-events:auto!important;position:relative!important;z-index:10001!important;}
+.hero{position:relative!important;z-index:1!important;}
+.hero .hero-inner{position:relative!important;z-index:1!important;}
+.hero .hero-inner::before{background-image:url("assets/jinshiuan-home-hero.webp.png")!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;pointer-events:none!important;}
+.hero .hero-inner>.hero-product,.hero .hero-inner>.hero-copy{display:none!important;}
+.hero .hero-inner>.hero-carousel{display:flex!important;order:1!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;max-width:none!important;margin:0!important;padding:28px 24px 34px!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;}
+.hero .hero-inner>.hero-carousel .home-carousel-wrap{width:100%!important;max-width:1100px!important;margin:0 auto!important;}
+.hero .hero-inner>.hero-carousel .home-carousel-viewport{width:100%!important;height:430px!important;}
+@media(max-width:700px){
+  .hero .hero-inner>.hero-carousel{padding:22px 12px 28px!important;}
+  .hero .hero-inner>.hero-carousel .home-carousel-viewport{height:300px!important;}
+}
+</style>
 </head><body>
 <header class="topbar" id="top"><div class="wrap js-header-wrap"><a class="brand js-brand" href="#top" aria-label="JINSHIUAN AUTO PARTS LTD."><img class="js-header-logo" src="assets/jinshiuan-logo-new.webp" alt="JINSHIUAN AUTO PARTS LTD." loading="eager"></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
 <main><section class="hero" id="home"><img class="js-fixed-home-hero" src="assets/jinshiuan-home-hero.webp.png" alt="JINSHIUAN AUTO PARTS LTD. homepage" loading="eager"></section>
