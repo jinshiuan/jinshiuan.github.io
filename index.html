@@ -190,13 +190,26 @@ document.addEventListener('DOMContentLoaded', function () {
 @media(max-width:1100px){.topbar{min-height:120px !important;height:120px !important}.js-header-wrap,.js-brand{height:120px !important}.js-header-logo{width:100px !important;height:100px !important;flex-basis:100px !important}.js-header-company strong{font-size:38px !important}.js-header-company span{font-size:16px !important;letter-spacing:3px !important}}
 @media(max-width:700px){.topbar{min-height:95px !important;height:95px !important}.js-header-wrap,.js-brand{height:95px !important}.js-header-logo{width:72px !important;height:72px !important;flex-basis:72px !important}.js-header-company strong{font-size:25px !important}.js-header-company span{font-size:11px !important;letter-spacing:2px !important;transform:translateX(5px) !important}}
 </style>
+
+<style id="homepage-redo-final">
+.home-hero-image{width:100%;background:#fff;overflow:hidden;line-height:0;position:relative;z-index:1}
+.home-hero-image img{display:block;width:100%;height:auto;max-width:none;object-fit:cover}
+.home-featured{background:#fff;padding:34px 0 50px;position:relative;z-index:2}
+.home-featured>.wrap{max-width:1240px}
+.home-featured>.wrap>.eyebrow{text-align:center;margin-bottom:12px}
+.home-featured .home-carousel-wrap{max-width:1100px}
+.home-featured .home-carousel-viewport{height:360px;border-radius:16px}
+.home-featured .home-carousel-slide img{padding:18px}
+@media(max-width:700px){
+  .home-featured{padding:26px 0 38px}
+  .home-featured .home-carousel-viewport{height:300px;border-radius:12px}
+  .home-featured .home-carousel-slide img{padding:12px}
+}
+</style>
 </head><body>
 <header class="topbar" id="top"><div class="wrap js-header-wrap"><a class="brand js-brand" href="#top" aria-label="JINSHIUAN AUTO PARTS LTD."><img class="js-header-logo" src="assets/jinshiuan-logo-new.webp?v=d069c5ac3b180c821d43e3294a77174205374cea" alt="JINSHIUAN logo" loading="eager"><span class="js-header-company"><strong><b class="js-gold">J</b>IN<b class="js-silver">S</b>HIUAN</strong><span>AUTO PARTS LTD.</span></span></a><nav class="nav"><a href="#products" data-nav="products">Products</a><a href="#partsl-search" data-nav="partsl-search">PARTSLINK SEARCH</a><a href="#about" data-nav="about">About</a><a href="#contact" data-nav="contact">Contact</a></nav></div></header>
-<main><section class="hero"><div class="wrap hero-inner">
-<div class="hero-product"><div class="hero-static"><img src="assets/jinshiuan-building-new(1).png?v=2026092101" alt="JINSHIUAN Factory Building" loading="eager"></div></div>
-<div class="hero-copy"><div class="kicker">JINSHIUAN</div><h1>AUTO<br>PARTS</h1><p>Parts Development · Sourcing · Export</p><a class="btn" href="#products">VIEW PRODUCTS</a></div>
-<div class="hero-carousel"><div class="eyebrow">FEATURED PRODUCTS</div><div class="home-carousel-wrap"><div class="home-carousel-viewport" id="homeCarouselViewport"><div class="home-carousel-slide active"><img src="assets/image-01.webp" alt="JINSHIUAN Automotive Part 01" loading="eager"></div></div><button class="home-carousel-btn home-carousel-prev" id="homeCarouselPrev" type="button" aria-label="Previous">‹</button><button class="home-carousel-btn home-carousel-next" id="homeCarouselNext" type="button" aria-label="Next">›</button><div class="home-carousel-dots" id="homeCarouselDots"></div></div></div>
-</div></section>
+<main><section class="home-hero-image" aria-label="JINSHIUAN AUTO PARTS"><img src="assets/jinshiuan-home-hero.webp.png" alt="JINSHIUAN AUTO PARTS" loading="eager"></section>
+<section class="home-featured" aria-label="Featured Products"><div class="wrap"><div class="eyebrow">FEATURED PRODUCTS</div><div class="home-carousel-wrap"><div class="home-carousel-viewport" id="homeCarouselViewport"><div class="home-carousel-slide active"><img src="assets/image-01.webp" alt="JINSHIUAN Automotive Part 01" loading="eager"></div></div><button class="home-carousel-btn home-carousel-prev" id="homeCarouselPrev" type="button" aria-label="Previous">‹</button><button class="home-carousel-btn home-carousel-next" id="homeCarouselNext" type="button" aria-label="Next">›</button><div class="home-carousel-dots" id="homeCarouselDots"></div></div></div></section>
 <section class="pl-section" id="partsl-search"><div class="pl-wrap">
 <div class="pl-eyebrow">PARTSLINK &amp; PART NUMBER</div>
 <h2 class="pl-title">Find the Parts You Need</h2>
