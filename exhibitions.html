@@ -33,6 +33,7 @@ try{
  const items=await response.json();
  gallery.replaceChildren();
  if(!items.length){const p=document.createElement('p');p.textContent='目前尚無展覽資料';gallery.appendChild(p);return;}
+ items.sort((a,b)=>(a.media_type==='video'?-1:0)-(b.media_type==='video'?-1:0));
  items.forEach((item)=>{
   const card=document.createElement('article');card.className='item';
   const media=document.createElement('div');media.className='media';
