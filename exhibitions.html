@@ -21,10 +21,29 @@ footer{text-align:center;color:#7f899a;font-size:11px;padding:0 20px 22px;letter
 <body>
 <header class="top"><a class="brand" href="index.html" style="color:#fff;text-decoration:none">JINSHIUAN AUTO PARTS LTD.</a><nav style="display:flex;align-items:center;gap:clamp(10px,2vw,26px);flex-wrap:wrap;justify-content:flex-end;font-size:13px"><a href="index.html#products" style="color:#fff;text-decoration:none">Products</a><a href="index.html#partsl-search" style="color:#fff;text-decoration:none">PARTSLINK SEARCH</a><a href="index.html#about" style="color:#fff;text-decoration:none">About</a><a href="index.html#contact" style="color:#fff;text-decoration:none">Contact</a><a class="back" href="index.html">返回公司首頁</a></nav></header>
 <main><div class="heading"><div><div class="eyebrow">JINSHIUAN EXHIBITIONS</div><h1>展覽活動</h1></div><p>展覽現場照片與活動紀錄</p></div>
-<section class="gallery">
-<div class="item"><div class="media"><img src="https://mkujndpbwjwumcclafcd.supabase.co/storage/v1/object/public/exhibitions-media/f559a534-fd76-46d2-aabe-87836cc9d86e/exhibition-1795662323504-uiw8eb.jpg" alt="JINSHIUAN 展覽攤位全景"></div><div class="caption">JINSHIUAN EXHIBITIONS</div></div>
-<div class="item"><div class="media"><img src="https://mkujndpbwjwumcclafcd.supabase.co/storage/v1/object/public/exhibitions-media/f559a534-fd76-46d2-aabe-87836cc9d86e/exhibition-1795662326436-1f4xin.jpg" alt="JINSHIUAN 汽車零件展示"></div><div class="caption">JINSHIUAN EXHIBITIONS</div></div>
-<div class="item"><div class="media"><img src="https://mkujndpbwjwumcclafcd.supabase.co/storage/v1/object/public/exhibitions-media/f559a534-fd76-46d2-aabe-87836cc9d86e/exhibition-1795662328059-hrntcz.jpg" alt="JINSHIUAN 汽車零件展示"></div><div class="caption">JINSHIUAN EXHIBITIONS</div></div>
-<div class="item"><div class="media"><video controls playsinline preload="metadata" src="https://mkujndpbwjwumcclafcd.supabase.co/storage/v1/object/public/exhibitions-media/f559a534-fd76-46d2-aabe-87836cc9d86e/exhibition-1795662329670-lvzvqj.mov"></video></div><div class="caption">GUEST VISIT · 活動紀錄</div></div>
-</section></main><footer>JINSHIUAN AUTO PARTS LTD. · EXHIBITIONS</footer>
+<section class="gallery" id="exhibitionGallery"><p style="color:#cbd5e1">展覽資料載入中...</p></section></main><footer>JINSHIUAN AUTO PARTS LTD. · EXHIBITIONS</footer>
+<script>
+(async function(){
+const gallery=document.getElementById('exhibitionGallery');
+const endpoint='https://mkujndpbwjwumcclafcd.supabase.co/rest/v1/exhibition_media?select=title,media_type,public_url,sort_order&active=eq.true&order=sort_order.asc,created_at.asc';
+const key='sb_publishable_QwdKQAw1bqwDCF05-ghdMg_Ipj6kghD';
+try{
+ const response=await fetch(endpoint,{headers:{apikey:key,Authorization:'Bearer '+key}});
+ if(!response.ok)throw new Error('HTTP '+response.status);
+ const items=await response.json();
+ gallery.replaceChildren();
+ if(!items.length){const p=document.createElement('p');p.textContent='目前尚無展覽資料';gallery.appendChild(p);return;}
+ items.forEach((item)=>{
+  const card=document.createElement('article');card.className='item';
+  const media=document.createElement('div');media.className='media';
+  let element;
+  if(item.media_type==='video'){element=document.createElement('video');element.controls=true;element.playsInline=true;element.preload='metadata';}
+  else{element=document.createElement('img');element.loading='lazy';element.alt=item.title||'JINSHIUAN 展覽照片';}
+  element.src=item.public_url;media.appendChild(element);
+  const caption=document.createElement('div');caption.className='caption';caption.textContent=item.title||'JINSHIUAN EXHIBITIONS';
+  card.append(media,caption);gallery.appendChild(card);
+ });
+}catch(error){console.error('Exhibitions load error',error);gallery.textContent='展覽資料暫時無法載入，請稍後再試。';}
+})();
+</script>
 </body></html>
