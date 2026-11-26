@@ -38,7 +38,7 @@ try{
   const card=document.createElement('article');card.className='item';
   const media=document.createElement('div');media.className='media';
   let element;
-  if(item.media_type==='video'){element=document.createElement('video');element.controls=true;element.playsInline=true;element.preload='metadata';element.src=item.public_url;media.appendChild(element);}
+  if(item.media_type==='video'){element=document.createElement('video');element.controls=true;element.playsInline=true;element.preload='metadata';element.src=item.public_url;media.appendChild(element);const videoLink=document.createElement('a');videoLink.href='exhibition-photo.html?id='+encodeURIComponent(item.id);videoLink.textContent='開啟影片專屬頁面 ↗';videoLink.style.cssText='display:block;margin:10px 0 0;color:#d7b66e;font-size:13px;text-decoration:none';card.appendChild(videoLink);}
   else{element=document.createElement('img');element.loading='lazy';element.alt=item.title||'JINSHIUAN 展覽照片';element.src=item.public_url;const link=document.createElement('a');link.href='exhibition-photo.html?id='+encodeURIComponent(item.id);link.title='查看展覽照片詳情';link.style.cssText='display:block;width:100%;height:100%;cursor:pointer';link.appendChild(element);media.appendChild(link);}
   const caption=document.createElement('div');caption.className='caption';caption.textContent=item.title||'JINSHIUAN EXHIBITIONS';
   card.append(media,caption);gallery.appendChild(card);
